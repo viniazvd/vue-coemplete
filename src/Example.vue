@@ -17,8 +17,8 @@
 <script lang="ts">
 import Vue from 'vue'
 import data from './data'
-import findByInclusive from './findByInclusive.ts'
-import VueAutoComplete from './components/VueAutoComplete.vue'
+import inclusiveSearch from './inclusiveSearch'
+import VueAutoComplete from './VueAutoComplete.vue'
 
 interface Item {
   key: string
@@ -44,7 +44,7 @@ export default Vue.extend({
     onSearch (value: string) {
       this.search = value
 
-      const results = findByInclusive(data, this.search, this.searchProp)
+      const results = inclusiveSearch(data, this.search, this.searchProp)
 
       this.options = results
     },
