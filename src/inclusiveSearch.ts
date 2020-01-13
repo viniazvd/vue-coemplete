@@ -8,10 +8,10 @@ function getMatches (word: string, words: string): number {
     : 0
 }
 
-function findByInclusive (xs: string[] = [], query: string = '', key: string = ''): any[] {
+function findByInclusive (xs: object[] = [], query: string = '', key: string = ''): any[] {
   const words: string[] = getWords(query)
 
-  return xs.filter(option => words.every(word => getMatches(word, (option[key] || ''))))
+  return xs.filter(option => words.every(word => console.log(word, option) || getMatches(word, (option[key] || ''))))
 }
 
 export default findByInclusive
