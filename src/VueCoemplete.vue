@@ -1,5 +1,5 @@
 <template>
-  <div class="c-auto-complete">
+  <div class="vue-coemplete">
     <div class="search-wrapper">
       <slot name="input" :on-search="onSearch">
         <input class="input" :value="search" @input="event => onSearch(event.target.value)" />
@@ -67,7 +67,7 @@ export default Vue.extend({
   methods: {
     onSearch (value: string): void {
       this.search = value
-      this.$emit('input', value)
+      this.$emit('input', value) // necessary?
 
       const results = inclusiveSearch(this.options, this.search, this.searchProp)
 
@@ -105,12 +105,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.c-auto-complete {
+.vue-coemplete {
   display: flex;
   flex-direction: column;
 
-  height: 100%;
-  border-radius: 20px 20px 5px 5px;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
 
   & > .search-wrapper {
