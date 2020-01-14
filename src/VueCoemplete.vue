@@ -8,7 +8,7 @@
 
     <div v-show="search" class="list-wrapper">
       <div class="list">
-        <a
+        <router-link
           v-for="(item, index) in items"
           :key="index"
           :to="{ name: item.route }"
@@ -17,7 +17,7 @@
           <slot name="sufix" :item="item" />
           <span :ref="index" class="text">{{ setHightlight(item[searchProp], index) }}</span>
           <slot name="after" :item="item" />
-        </a>
+        </router-link>
       </div>
     </div>
   </div>
