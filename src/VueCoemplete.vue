@@ -1,7 +1,7 @@
 <template>
   <div class="c-auto-complete">
     <div class="search-wrapper">
-      <slot :on-search="onSearch">
+      <slot name="input" :on-search="onSearch">
         <input class="input" :value="search" @input="event => onSearch(event.target.value)" />
       </slot>
     </div>
@@ -14,7 +14,9 @@
           :to="{ name: item.route }"
           class="item"
         >
-          <span :ref="index" class="text">{{ getResult(item, index) }}</span>
+          <slot name="sufix" :item="item" />
+          <span :ref="index" class="text">{{ setHightlight(item[searchProp], index) }}</span>
+          <slot name="after" :item="item" />
         </a>
       </div>
     </div>
@@ -41,21 +43,20 @@ export default Vue.extend({
     value: String,
 
     options: {
-      type: Array,
+      type: Array as () => Item[],
       required: true
     },
 
-    displayBy: {
-      type: Array,
-      required: true
+    searchProp: {
+      type: String,
+      default: 'key'
     }
   },
 
   data () {
     return {
       items: [] as Item[],
-      search: '' as string,
-      searchProp: 'key' as string
+      search: '' as string
     }
   },
 
@@ -73,31 +74,31 @@ export default Vue.extend({
       this.items = results
     },
 
-    getResult (item: Item, index: number): void {
-      if (!item || !Object.keys(this.$refs).length) return
+    setHightlight (item: string, index: number): void {
+      // reason: wait for loop items to render/assemble to use $refs
+      this.$nextTick(() => {
+        const itemRef: { [key: number]: any } = this.$refs[index]
+        const el: HTMLSpanElement = itemRef[0]
 
-      const itemRef: { [key: number]: any } = this.$refs[index]
-      const el: HTMLSpanElement = itemRef[0]
+        // reset data
+        el.innerHTML = ''
 
-      if (!el) return
+        item
+          .split(this.search)
+          .forEach((chunk: string, i: number, array: string[]) => {
+            const hasAfter: Boolean = !!array[i + 1]
+            const hasBefore: Boolean = !!array[i - 1]
+            const B_TAG: HTMLElement = document.createElement('b')
 
-      // reset data
-      el.innerHTML = ''
+            if (!chunk) el.innerHTML += this.search
+            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = this.search
 
-      item[this.searchProp]
-        .split(this.search)
-        .forEach((chunk: string, i: number, array: string[]) => {
-          const hasAfter: Boolean = !!array[i + 1]
-          const hasBefore: Boolean = !!array[i - 1]
-          const B_TAG: HTMLElement = document.createElement('b')
+            B_TAG.innerHTML += chunk
+            el.appendChild(B_TAG)
 
-          if (!chunk) el.innerHTML += this.search
-
-          B_TAG.innerHTML += chunk
-          el.appendChild(B_TAG)
-
-          if (chunk && !hasBefore && hasAfter) el.innerHTML += this.search
-        })
+            if (chunk && !hasBefore && hasAfter) el.innerHTML += this.search
+          })
+      })
     }
   }
 })
@@ -107,7 +108,7 @@ export default Vue.extend({
 .c-auto-complete {
   display: flex;
 
-  max-height: 285px;
+  height: 100%;
   max-width: 350px;
   border-radius: 20px 20px 5px 5px;
   box-shadow: 0 2px 6px 0 rgba(0,0,0,0.2);
