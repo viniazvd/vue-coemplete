@@ -107,16 +107,13 @@ export default Vue.extend({
 <style lang="scss">
 .c-auto-complete {
   display: flex;
+  flex-direction: column;
 
   height: 100%;
-  max-width: 350px;
+  min-width: 350px;
   border-radius: 20px 20px 5px 5px;
   box-shadow: 0 2px 6px 0 rgba(0,0,0,0.2);
   background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.83) 100%);
-
-  border-radius: 20px;
-  flex-direction: column;
-  background-color: #FFF;
 
   & > .search-wrapper {
     display: flex;
@@ -159,24 +156,21 @@ export default Vue.extend({
         align-items: center;
 
         height: 40px;
-
-        opacity: 1;
+        opacity: 0.8;
         cursor: pointer;
+        font-size: 14px;
+        color: #121E48;
+        line-height: 19px;
         padding: 10px 15px;
-        text-decoration: none;
-        background-color: transparent;
-        color: black;
-        transition: opacity .3s,  background-color .3s;
 
-        & > .text {
-          display: inline-block;
-          max-width: calc(100% - 10px);
-          overflow-x: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 10px);
 
-        &:hover { background-color: red; }
+        & > .text {}
+
+        &:hover { background: rgba(18, 30, 72, 0.05); }
       }
     }
   }
