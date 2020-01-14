@@ -1,24 +1,20 @@
-# vue-auto-complete
+<h1 align="center">vue-coemplete ✅</h1>
 
-## Project setup
-```
-yarn install
-```
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/npm/l/vuelidation.svg" alt="License" target="_blank"></a>
+</p>
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+<br>
 
-### Compiles and minifies for production
-```
-yarn build
-```
+<p align="center">
+  ✨ <a href="https://viniazvd.github.io/vue-coemplete/">Example</a>✨
+</p>
 
-### Lints and fixes files
-```
-yarn lint
-```
+## Install
+`yarn add vue-coemplete` or `npm install vue-coemplete`
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
+## Contributor
+- https://github.com/Giseudo
+
+**Made in:** @convenia
