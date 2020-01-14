@@ -110,10 +110,8 @@ export default Vue.extend({
   flex-direction: column;
 
   height: 100%;
-  min-width: 350px;
   border-radius: 20px 20px 5px 5px;
-  box-shadow: 0 2px 6px 0 rgba(0,0,0,0.2);
-  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.83) 100%);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
 
   & > .search-wrapper {
     display: flex;
@@ -122,8 +120,8 @@ export default Vue.extend({
 
     & > .input {
       flex: 1;
-      width: 100%;
       outline: 0;
+      width: 100%;
       border: none;
       height: 40px;
       font-size: 14px;
@@ -131,15 +129,16 @@ export default Vue.extend({
       border-radius: 20px;
       padding-right: 40px;
       transition: all .3s;
-      box-shadow: 0 0 0 0 rgba(0,0,0,0);
+      color: rgba(18, 30, 72, 0.8);
+      background: rgba(18, 30, 72, 0.05);
     }
   }
 
   & > .list-wrapper {
     display: flex;
 
-    // The entire popover's height minus the heading's height.
-    max-height: calc(310px - 101px);
+    // 40 = input size
+    max-height: calc(285px - 40px);
 
     & > .list {
       font-size: 14px;
@@ -157,11 +156,12 @@ export default Vue.extend({
 
         height: 40px;
         opacity: 0.8;
-        cursor: pointer;
+        padding: 0 15px;
         font-size: 14px;
         color: #121E48;
         line-height: 19px;
-        padding: 10px 15px;
+
+        cursor: pointer;
 
         overflow-x: hidden;
         white-space: nowrap;
