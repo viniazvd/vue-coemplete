@@ -8,16 +8,17 @@
 
     <div v-show="search" class="list-wrapper">
       <div class="list">
-        <router-link
+        <component
           v-for="(item, index) in items"
+          :is="tag"
           :key="index"
-          :to="{ name: item.route }"
           class="item"
+          @click="$emit('vue-complete:item', item)"
         >
           <slot name="sufix" :item="item" />
           <span :ref="index" class="text">{{ setHightlight(item[searchProp], index) }}</span>
           <slot name="after" :item="item" />
-        </router-link>
+        </component>
       </div>
     </div>
   </div>
@@ -41,6 +42,11 @@ export default Vue.extend({
     placeholder: String,
 
     value: String,
+
+    tag: {
+      type: String,
+      default: 'a'
+    },
 
     options: {
       type: Array as () => Item[],
@@ -126,7 +132,6 @@ export default Vue.extend({
       padding-left: 15px;
       border-radius: 20px;
       padding-right: 40px;
-      transition: all .3s;
       color: rgba(18, 30, 72, 0.8);
       background: rgba(18, 30, 72, 0.05);
     }
@@ -165,8 +170,6 @@ export default Vue.extend({
         white-space: nowrap;
         text-overflow: ellipsis;
         max-width: calc(100% - 10px);
-
-        & > .text {}
 
         &:hover { background: rgba(18, 30, 72, 0.05); }
       }
