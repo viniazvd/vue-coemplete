@@ -106,6 +106,25 @@ function _interopDefault(ex) {
 
 var Vue = _interopDefault(__webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.runtime.esm.js"));
 
+var clickOutside = {
+  bind(el, binding) {
+    const handler = e => {
+      if (!el.contains(e.target) && el !== e.target) {
+        binding.value(e);
+      }
+    };
+
+    el.__vueClickOutside__ = handler;
+    document.addEventListener('click', handler);
+  },
+
+  unbind(el) {
+    document.removeEventListener('click', el.__vueClickOutside__);
+    el.__vueClickOutside__ = null;
+  }
+
+};
+
 function getWords(query) {
   return query.trim().split(' ');
 }
@@ -153,20 +172,30 @@ var script = Vue.extend({
       default: 'key'
     }
   },
+  directives: {
+    clickOutside: clickOutside
+  },
   data: function () {
     return {
       items: [],
-      search: ''
+      search: '',
+      showItems: false
     };
+  },
+  watch: {
+    search: function () {
+      this.showItems = true;
+    }
   },
   mounted: function () {
     this.search = this.value;
   },
   methods: {
+    close: function () {
+      this.showItems = false;
+    },
     onSearch: function (value) {
       this.search = value;
-      this.$emit('input', value); // necessary?
-
       var results = findByInclusive(this.options, this.search, this.searchProp);
       this.items = results;
     },
@@ -343,7 +372,22 @@ var __vue_render__ = function () {
   var _c = _vm._self._c || _h;
 
   return _c("div", {
-    staticClass: "vue-coemplete"
+    directives: [{
+      name: "click-outside",
+      rawName: "v-click-outside",
+      value: _vm.close,
+      expression: "close"
+    }],
+    staticClass: "vue-coemplete",
+    on: {
+      keyup: function ($event) {
+        if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "esc", 27, $event.key, ["Esc", "Escape"])) {
+          return null;
+        }
+
+        return _vm.close($event);
+      }
+    }
   }, [_c("div", {
     staticClass: "search-wrapper"
   }, [_vm._t("input", [_c("input", {
@@ -362,8 +406,8 @@ var __vue_render__ = function () {
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: _vm.search,
-      expression: "search"
+      value: _vm.search && _vm.showItems,
+      expression: "search && showItems"
     }],
     staticClass: "list-wrapper"
   }, [_c("div", {
@@ -396,15 +440,15 @@ __vue_render__._withStripped = true;
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-cfd78850_0", {
+  inject("data-v-718d3629_0", {
     source: ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n.vue-coemplete > .list-wrapper {\n  display: flex;\n  max-height: calc(285px - 40px);\n}\n.vue-coemplete > .list-wrapper > .list {\n  font-size: 14px;\n  display: flex;\n  flex-direction: column;\n  flex-basis: 100%;\n  overflow-y: auto;\n}\n.vue-coemplete > .list-wrapper > .list > .item {\n  display: flex;\n  flex-shrink: 0;\n  align-items: center;\n  height: 40px;\n  opacity: 0.8;\n  padding: 0 15px;\n  font-size: 14px;\n  color: #121E48;\n  line-height: 19px;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  max-width: calc(100% - 10px);\n}\n.vue-coemplete > .list-wrapper > .list > .item:hover {\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */",
     map: {
       "version": 3,
       "sources": ["/home/viniazvd/Área de Trabalho/convenia-spa/vue-coemplete/src/VueCoemplete.vue", "VueCoemplete.vue"],
       "names": [],
-      "mappings": "AAiHA;EACA,aAAA;EACA,sBAAA;EAEA,0CAAA;ACjHA;ADmHA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;ACjHA;ADmHA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;ACjHA;ADqHA;EACA,aAAA;EAGA,8BAAA;ACrHA;ADuHA;EACA,eAAA;EAEA,aAAA;EACA,sBAAA;EACA,gBAAA;EAEA,gBAAA;ACvHA;ADyHA;EACA,aAAA;EACA,cAAA;EACA,mBAAA;EAEA,YAAA;EACA,YAAA;EACA,eAAA;EACA,eAAA;EACA,cAAA;EACA,iBAAA;EAEA,eAAA;EAEA,kBAAA;EACA,mBAAA;EACA,uBAAA;EACA,4BAAA;AC1HA;AD4HA;EAAA,kCAAA;ACzHA;;AAEA,2CAA2C",
+      "mappings": "AA8HA;EACA,aAAA;EACA,sBAAA;EAEA,0CAAA;AC9HA;ADgIA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;AC9HA;ADgIA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;AC9HA;ADkIA;EACA,aAAA;EAGA,8BAAA;AClIA;ADoIA;EACA,eAAA;EAEA,aAAA;EACA,sBAAA;EACA,gBAAA;EAEA,gBAAA;ACpIA;ADsIA;EACA,aAAA;EACA,cAAA;EACA,mBAAA;EAEA,YAAA;EACA,YAAA;EACA,eAAA;EACA,eAAA;EACA,cAAA;EACA,iBAAA;EAEA,eAAA;EAEA,kBAAA;EACA,mBAAA;EACA,uBAAA;EACA,4BAAA;ACvIA;ADyIA;EAAA,kCAAA;ACtIA;;AAEA,2CAA2C",
       "file": "VueCoemplete.vue",
-      "sourcesContent": ["<template>\n  <div class=\"vue-coemplete\">\n    <div class=\"search-wrapper\">\n      <slot name=\"input\" :on-search=\"onSearch\">\n        <input class=\"input\" :value=\"search\" @input=\"event => onSearch(event.target.value)\" />\n      </slot>\n    </div>\n\n    <div v-show=\"search\" class=\"list-wrapper\">\n      <div class=\"list\">\n        <component\n          v-for=\"(item, index) in items\"\n          :is=\"tag\"\n          :key=\"index\"\n          class=\"item\"\n          @click=\"$emit('vue-complete:item', item)\"\n        >\n          <slot name=\"sufix\" :item=\"item\" />\n          <span :ref=\"index\" class=\"text\">{{ setHightlight(item[searchProp], index) }}</span>\n          <slot name=\"after\" :item=\"item\" />\n        </component>\n      </div>\n    </div>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\nimport inclusiveSearch from './inclusiveSearch'\n\ninterface Item {\n  [key: string]: string\n  area: string\n  route: string\n  selector: string\n}\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  props: {\n    placeholder: String,\n\n    value: String,\n\n    tag: {\n      type: String,\n      default: 'a'\n    },\n\n    options: {\n      type: Array as () => Item[],\n      required: true\n    },\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    }\n  },\n\n  data () {\n    return {\n      items: [] as Item[],\n      search: '' as string\n    }\n  },\n\n  mounted () {\n    this.search = this.value\n  },\n\n  methods: {\n    onSearch (value: string): void {\n      this.search = value\n      this.$emit('input', value) // necessary?\n\n      const results = inclusiveSearch(this.options, this.search, this.searchProp)\n\n      this.items = results\n    },\n\n    setHightlight (item: string, index: number): void {\n      // reason: wait for loop items to render/assemble to use $refs\n      this.$nextTick(() => {\n        const itemRef: { [key: number]: any } = this.$refs[index]\n        const el: HTMLSpanElement = itemRef[0]\n\n        // reset data\n        el.innerHTML = ''\n\n        item\n          .split(this.search)\n          .forEach((chunk: string, i: number, array: string[]) => {\n            const hasAfter: Boolean = !!array[i + 1]\n            const hasBefore: Boolean = !!array[i - 1]\n            const B_TAG: HTMLElement = document.createElement('b')\n\n            if (!chunk) el.innerHTML += this.search\n            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = this.search\n\n            B_TAG.innerHTML += chunk\n            el.appendChild(B_TAG)\n\n            if (chunk && !hasBefore && hasAfter) el.innerHTML += this.search\n          })\n      })\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n\n  & > .list-wrapper {\n    display: flex;\n\n    // 40 = input size\n    max-height: calc(285px - 40px);\n\n    & > .list {\n      font-size: 14px;\n\n      display: flex;\n      flex-direction: column;\n      flex-basis: 100%;\n\n      overflow-y: auto;\n\n      & > .item {\n        display: flex;\n        flex-shrink: 0;\n        align-items: center;\n\n        height: 40px;\n        opacity: 0.8;\n        padding: 0 15px;\n        font-size: 14px;\n        color: #121E48;\n        line-height: 19px;\n\n        cursor: pointer;\n\n        overflow-x: hidden;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        max-width: calc(100% - 10px);\n\n        &:hover { background: rgba(18, 30, 72, 0.05); }\n      }\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n.vue-coemplete > .list-wrapper {\n  display: flex;\n  max-height: calc(285px - 40px);\n}\n.vue-coemplete > .list-wrapper > .list {\n  font-size: 14px;\n  display: flex;\n  flex-direction: column;\n  flex-basis: 100%;\n  overflow-y: auto;\n}\n.vue-coemplete > .list-wrapper > .list > .item {\n  display: flex;\n  flex-shrink: 0;\n  align-items: center;\n  height: 40px;\n  opacity: 0.8;\n  padding: 0 15px;\n  font-size: 14px;\n  color: #121E48;\n  line-height: 19px;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  max-width: calc(100% - 10px);\n}\n.vue-coemplete > .list-wrapper > .list > .item:hover {\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
+      "sourcesContent": ["<template>\n  <div class=\"vue-coemplete\" v-click-outside=\"close\" @keyup.esc=\"close\">\n    <div class=\"search-wrapper\">\n      <slot name=\"input\" :on-search=\"onSearch\">\n        <input class=\"input\" :value=\"search\" @input=\"event => onSearch(event.target.value)\" />\n      </slot>\n    </div>\n\n    <div v-show=\"search && showItems\" class=\"list-wrapper\">\n      <div class=\"list\">\n        <component\n          v-for=\"(item, index) in items\"\n          :is=\"tag\"\n          :key=\"index\"\n          class=\"item\"\n          @click=\"$emit('vue-complete:item', item)\"\n        >\n          <slot name=\"sufix\" :item=\"item\" />\n          <span :ref=\"index\" class=\"text\">{{ setHightlight(item[searchProp], index) }}</span>\n          <slot name=\"after\" :item=\"item\" />\n        </component>\n      </div>\n    </div>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\nimport clickOutside from './clickOutside'\nimport inclusiveSearch from './inclusiveSearch'\n\ninterface Item {\n  [key: string]: string\n  area: string\n  route: string\n  selector: string\n}\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  props: {\n    placeholder: String,\n\n    value: String,\n\n    tag: {\n      type: String,\n      default: 'a'\n    },\n\n    options: {\n      type: Array as () => Item[],\n      required: true\n    },\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      items: [] as Item[],\n      search: '' as string,\n      showItems: false as boolean\n    }\n  },\n\n  watch: {\n    search () {\n      this.showItems = true\n    }\n  },\n\n  mounted () {\n    this.search = this.value\n  },\n\n  methods: {\n    close () {\n      this.showItems = false\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n\n      const results = inclusiveSearch(this.options, this.search, this.searchProp)\n\n      this.items = results\n    },\n\n    setHightlight (item: string, index: number): void {\n      // reason: wait for loop items to render/assemble to use $refs\n      this.$nextTick(() => {\n        const itemRef: { [key: number]: any } = this.$refs[index]\n        const el: HTMLSpanElement = itemRef[0]\n\n        // reset data\n        el.innerHTML = ''\n\n        item\n          .split(this.search)\n          .forEach((chunk: string, i: number, array: string[]) => {\n            const hasAfter: Boolean = !!array[i + 1]\n            const hasBefore: Boolean = !!array[i - 1]\n            const B_TAG: HTMLElement = document.createElement('b')\n\n            if (!chunk) el.innerHTML += this.search\n            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = this.search\n\n            B_TAG.innerHTML += chunk\n            el.appendChild(B_TAG)\n\n            if (chunk && !hasBefore && hasAfter) el.innerHTML += this.search\n          })\n      })\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n\n  & > .list-wrapper {\n    display: flex;\n\n    // 40 = input size\n    max-height: calc(285px - 40px);\n\n    & > .list {\n      font-size: 14px;\n\n      display: flex;\n      flex-direction: column;\n      flex-basis: 100%;\n\n      overflow-y: auto;\n\n      & > .item {\n        display: flex;\n        flex-shrink: 0;\n        align-items: center;\n\n        height: 40px;\n        opacity: 0.8;\n        padding: 0 15px;\n        font-size: 14px;\n        color: #121E48;\n        line-height: 19px;\n\n        cursor: pointer;\n\n        overflow-x: hidden;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        max-width: calc(100% - 10px);\n\n        &:hover { background: rgba(18, 30, 72, 0.05); }\n      }\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n.vue-coemplete > .list-wrapper {\n  display: flex;\n  max-height: calc(285px - 40px);\n}\n.vue-coemplete > .list-wrapper > .list {\n  font-size: 14px;\n  display: flex;\n  flex-direction: column;\n  flex-basis: 100%;\n  overflow-y: auto;\n}\n.vue-coemplete > .list-wrapper > .list > .item {\n  display: flex;\n  flex-shrink: 0;\n  align-items: center;\n  height: 40px;\n  opacity: 0.8;\n  padding: 0 15px;\n  font-size: 14px;\n  color: #121E48;\n  line-height: 19px;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  max-width: calc(100% - 10px);\n}\n.vue-coemplete > .list-wrapper > .list > .item:hover {\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
     },
     media: undefined
   });
