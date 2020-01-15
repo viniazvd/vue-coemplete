@@ -1,12 +1,12 @@
 <template>
-  <div class="vue-coemplete">
+  <div class="vue-coemplete" v-click-outside="close" @keyup.esc="close">
     <div class="search-wrapper">
       <slot name="input" :on-search="onSearch">
         <input class="input" :value="search" @input="event => onSearch(event.target.value)" />
       </slot>
     </div>
 
-    <div v-show="search" class="list-wrapper">
+    <div v-show="search && showItems" class="list-wrapper">
       <div class="list">
         <component
           v-for="(item, index) in items"
@@ -26,6 +26,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import clickOutside from './clickOutside'
 import inclusiveSearch from './inclusiveSearch'
 
 interface Item {
@@ -59,10 +60,19 @@ export default Vue.extend({
     }
   },
 
+  directives: { clickOutside },
+
   data () {
     return {
       items: [] as Item[],
-      search: '' as string
+      search: '' as string,
+      showItems: false as boolean
+    }
+  },
+
+  watch: {
+    search () {
+      this.showItems = true
     }
   },
 
@@ -71,9 +81,12 @@ export default Vue.extend({
   },
 
   methods: {
+    close () {
+      this.showItems = false
+    },
+
     onSearch (value: string): void {
       this.search = value
-      this.$emit('input', value) // necessary?
 
       const results = inclusiveSearch(this.options, this.search, this.searchProp)
 
