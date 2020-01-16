@@ -1,8 +1,20 @@
 <template>
   <div class="vue-coemplete" v-click-outside="close" @keyup.esc="close">
     <div class="search-wrapper">
-      <slot name="input" :on-search="onSearch">
-        <input class="input" :value="search" @input="event => onSearch(event.target.value)" />
+      <slot
+        name="input"
+        :on-search="onSearch"
+        :keyboard-events="{ pointerForward, pointerBackward, addPointerElement }">
+
+        <input
+          class="input"
+          :value="search"
+          @keydown.down.prevent="pointerForward"
+          @keydown.up.prevent="pointerBackward"
+          @keydown.enter.tab.stop.self="addPointerElement"
+
+          @input="event => onSearch(event.target.value)"
+        />
       </slot>
     </div>
 
@@ -12,7 +24,8 @@
           v-for="(item, index) in items"
           :is="tag"
           :key="index"
-          class="item"
+          :class="['item', { '-active': index === pointer }]"
+          @mouseenter.self="pointerSet(index)"
           @click="$emit('vue-complete:item', item)"
         >
           <slot name="sufix" :item="item" />
@@ -64,6 +77,7 @@ export default Vue.extend({
 
   data () {
     return {
+      pointer: -1,
       items: [] as Item[],
       search: '' as string,
       showItems: false as boolean
@@ -81,6 +95,47 @@ export default Vue.extend({
   },
 
   methods: {
+    outside () {
+      // this.isOpened = false
+      // this.unsetFocus()
+      this.pointerReset()
+    },
+
+    pointerReset () {
+      this.pointer = -1
+    },
+
+    pointerSet (index) {
+      this.pointer = index
+    },
+
+    pointerForward () {
+      if (this.pointer < this.items.length - 1) this.pointer++
+    },
+
+    pointerBackward () {
+      if (this.pointer > 0) this.pointer--
+    },
+
+    addPointerElement ({ key } = 'Enter') {
+      if (this.items.length && key === 'Enter') {
+        const value = this.items[this.pointer].key
+        const hasSlot = !!Object.keys(this.$scopedSlots).length
+
+        if (hasSlot) {
+          this.onSearch(value)
+          this.$emit('vue-complete:select', value)
+        } else {
+          this.search = value
+        }
+
+        this.$nextTick(() => {
+          this.pointerReset()
+          this.showItems = false
+        })
+      }
+    },
+
     close () {
       this.showItems = false
     },
@@ -185,6 +240,7 @@ export default Vue.extend({
         max-width: calc(100% - 10px);
 
         &:hover { background: rgba(18, 30, 72, 0.05); }
+        &.-active { background-color: rgba(18, 30, 72, 0.05); }
       }
     }
   }
