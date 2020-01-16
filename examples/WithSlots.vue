@@ -1,10 +1,21 @@
 <template>
-  <vue-coemplete placeholder="Pesquisar" :options="options">
+  <vue-coemplete
+    placeholder="Pesquisar"
+    :options="options"
+    @vue-complete:select="value => searchValue = value"
+  >
     <input
       class="input"
       slot="input"
-      slot-scope="{ onSearch }"
-      @input="event => onSearch(event.target.value)"
+      slot-scope="{ onSearch, keyboardEvents }"
+
+      :value="searchValue"
+
+      @keydown.down.prevent="keyboardEvents.pointerForward"
+      @keydown.up.prevent="keyboardEvents.pointerBackward"
+      @keydown.enter.tab.stop.self="keyboardEvents.addPointerElement"
+
+      @input="event => onInput(event.target.value, onSearch)"
     />
 
     <div slot="after" slot-scope="{ item }"> - {{ item.area }}</div>
@@ -20,9 +31,20 @@ export default {
 
   components: { VueCoemplete },
 
+  data () {
+    return { searchValue: '' }
+  },
+
   computed: {
     options () {
       return [ ...data ]
+    }
+  },
+
+  methods: {
+    onInput (value, onSearch) {
+      this.searchValue = value
+      onSearch(this.searchValue)
     }
   }
 }
