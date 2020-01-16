@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-coemplete" v-click-outside="close" @keyup.esc="close">
+  <div class="vue-coemplete" :style="border" v-click-outside="close" @keyup.esc="close">
     <div class="search-wrapper">
       <slot
         name="input"
@@ -92,6 +92,16 @@ export default Vue.extend({
 
   mounted () {
     this.search = this.value
+  },
+
+  computed: {
+    border () {
+      return {
+        'border-radius': this.items.length && this.showItems
+          ? '20px 20px 5px 5px'
+          : '20px'
+      }
+    }
   },
 
   methods: {
@@ -227,9 +237,9 @@ export default Vue.extend({
 
         height: 40px;
         opacity: 0.8;
+        color: #121E48;
         padding: 0 15px;
         font-size: 14px;
-        color: #121E48;
         line-height: 19px;
 
         cursor: pointer;
@@ -239,7 +249,6 @@ export default Vue.extend({
         text-overflow: ellipsis;
         max-width: calc(100% - 10px);
 
-        &:hover { background: rgba(18, 30, 72, 0.05); }
         &.-active { background-color: rgba(18, 30, 72, 0.05); }
       }
     }
