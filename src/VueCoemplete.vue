@@ -18,7 +18,7 @@
       </slot>
     </div>
 
-    <div v-show="(search || value) && showItems" class="list-wrapper">
+    <div v-show="showItems" class="list-wrapper">
       <div class="list">
         <component
           v-for="(item, index) in __items"
@@ -91,7 +91,11 @@ export default Vue.extend({
 
   watch: {
     search () {
-      this.showItems = true
+      this.showItems = !!this.__items.length
+    },
+
+    value () {
+      this.showItems = !!this.__items.length
     }
   },
 
