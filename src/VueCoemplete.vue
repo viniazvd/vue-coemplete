@@ -78,10 +78,16 @@ export default Vue.extend({
 
   data () {
     return {
-      pointer: -1,
-      internalItems: [] as Item[],
       search: '' as string,
-      showItems: false as boolean
+      pointer: -1 as number,
+      showItems: false as boolean,
+      internalItems: [] as Item[]
+    }
+  },
+
+  watch: {
+    __items (value) {
+      this.showItems = !!value.length
     }
   },
 
