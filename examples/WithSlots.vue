@@ -27,7 +27,7 @@ import data from './data'
 import { VueCoemplete } from '../dist/bundle.cjs'
 
 export default {
-  name: 'example',
+  name: 'with-slots',
 
   components: { VueCoemplete },
 
