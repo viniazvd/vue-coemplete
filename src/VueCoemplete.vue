@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-coemplete" :style="border" v-click-outside="reset" @keyup.esc="close">
+  <div class="vue-coemplete" :style="border" v-click-outside="reset" @keyup.esc="reset">
     <div class="search-wrapper">
       <slot
         name="input"
@@ -8,7 +8,9 @@
 
         <input
           class="input"
+
           :value="search"
+
           @keydown.up.prevent="up"
           @keydown.down.prevent="down"
           @keydown.enter.tab.stop.self="select"
@@ -22,10 +24,12 @@
       <div class="list">
         <div
           v-for="(item, index) in __items"
+
           :key="index"
           :class="['item', { '-active': index === pointer }]"
-          @mouseenter.self="pointerSet(index)"
-          @click="select({}, item)"
+
+          @click="select({ key: 'Click' })"
+          @mouseenter.self="pointer = index"
         >
           <slot name="sufix" :item="item" />
           <span :ref="index" class="text">{{ setHightlight(item[searchProp], index) }}</span>
@@ -53,8 +57,6 @@ export default Vue.extend({
 
   props: {
     placeholder: String,
-
-    value: String,
 
     options: {
       type: Array as () => Item[],
@@ -86,15 +88,7 @@ export default Vue.extend({
   watch: {
     search () {
       this.showItems = !!this.__items.length
-    },
-
-    value () {
-      this.showItems = !!this.__items.length
     }
-  },
-
-  mounted () {
-    this.search = this.value
   },
 
   computed: {
@@ -119,15 +113,8 @@ export default Vue.extend({
 
   methods: {
     reset () {
-      // pointer reset
-      this.pointer = -1
-
       this.showItems = false
-    },
-
-    pointerSet (index) {
-      this.pointer = index
-      this.select()
+      this.pointer = -1 // reset pointer
     },
 
     down () {
@@ -138,8 +125,8 @@ export default Vue.extend({
       if (this.pointer > 0) this.pointer--
     },
 
-    select ({ key } = 'Enter', item: Object) {
-      if (key !== 'Enter' && !item) return
+    select ({ key } = 'Enter') {
+      if (key !== 'Enter' && key !== 'Click') return
 
       const item = this.__items[this.pointer]
 
