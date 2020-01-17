@@ -21,7 +21,7 @@
     <div v-show="search && showItems" class="list-wrapper">
       <div class="list">
         <component
-          v-for="(item, index) in items"
+          v-for="(item, index) in __items"
           :is="tag"
           :key="index"
           :class="['item', { '-active': index === pointer }]"
@@ -64,7 +64,12 @@ export default Vue.extend({
 
     options: {
       type: Array as () => Item[],
-      required: true
+      default: () => []
+    },
+
+    items: {
+      type: Array as () => Item[],
+      default: () => []
     },
 
     searchProp: {
@@ -78,7 +83,7 @@ export default Vue.extend({
   data () {
     return {
       pointer: -1,
-      items: [] as Item[],
+      internalItems: [] as Item[],
       search: '' as string,
       showItems: false as boolean
     }
@@ -97,10 +102,16 @@ export default Vue.extend({
   computed: {
     border () {
       return {
-        'border-radius': this.items.length && this.showItems
+        'border-radius': this.__items.length && this.showItems
           ? '20px 20px 5px 5px'
           : '20px'
       }
+    },
+
+    __items () {
+      if (this.items.length) return this.items
+
+      return this.internalItems
     }
   },
 
@@ -120,7 +131,7 @@ export default Vue.extend({
     },
 
     pointerForward () {
-      if (this.pointer < this.items.length - 1) this.pointer++
+      if (this.pointer < this.__items.length - 1) this.pointer++
     },
 
     pointerBackward () {
@@ -128,8 +139,8 @@ export default Vue.extend({
     },
 
     addPointerElement ({ key } = 'Enter') {
-      if (this.items.length && key === 'Enter') {
-        const value = this.items[this.pointer].key
+      if (this.__items.length && key === 'Enter') {
+        const value = this.__items[this.pointer].key
         const hasSlot = !!Object.keys(this.$scopedSlots).length
 
         if (hasSlot) {
@@ -155,7 +166,7 @@ export default Vue.extend({
 
       const results = inclusiveSearch(this.options, this.search, this.searchProp)
 
-      this.items = results
+      this.internalItems = results
     },
 
     setHightlight (item: string, index: number): void {
