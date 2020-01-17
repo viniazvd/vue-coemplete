@@ -1,17 +1,17 @@
 <template>
-  <div class="vue-coemplete" :style="border" v-click-outside="close" @keyup.esc="close">
+  <div class="vue-coemplete" :style="border" v-click-outside="reset" @keyup.esc="close">
     <div class="search-wrapper">
       <slot
         name="input"
         :on-search="onSearch"
-        :keyboard-events="{ pointerForward, pointerBackward, addPointerElement }">
+        :keyboard-events="{ up, down, select }">
 
         <input
           class="input"
           :value="search"
-          @keydown.down.prevent="pointerForward"
-          @keydown.up.prevent="pointerBackward"
-          @keydown.enter.tab.stop.self="addPointerElement"
+          @keydown.up.prevent="up"
+          @keydown.down.prevent="down"
+          @keydown.enter.tab.stop.self="select"
 
           @input="event => onSearch(event.target.value)"
         />
@@ -20,18 +20,17 @@
 
     <div v-show="showItems" class="list-wrapper">
       <div class="list">
-        <component
+        <div
           v-for="(item, index) in __items"
-          :is="tag"
           :key="index"
           :class="['item', { '-active': index === pointer }]"
           @mouseenter.self="pointerSet(index)"
-          @click="$emit('vue-complete:item', item)"
+          @click="select({}, item)"
         >
           <slot name="sufix" :item="item" />
           <span :ref="index" class="text">{{ setHightlight(item[searchProp], index) }}</span>
           <slot name="after" :item="item" />
-        </component>
+        </div>
       </div>
     </div>
   </div>
@@ -56,11 +55,6 @@ export default Vue.extend({
     placeholder: String,
 
     value: String,
-
-    tag: {
-      type: String,
-      default: 'a'
-    },
 
     options: {
       type: Array as () => Item[],
@@ -112,6 +106,10 @@ export default Vue.extend({
       }
     },
 
+    hasSlots () {
+      return !!Object.keys(this.$scopedSlots).length
+    },
+
     __items () {
       if (this.items.length) return this.items
 
@@ -120,49 +118,38 @@ export default Vue.extend({
   },
 
   methods: {
-    outside () {
-      // this.isOpened = false
-      // this.unsetFocus()
-      this.pointerReset()
-    },
-
-    pointerReset () {
+    reset () {
+      // pointer reset
       this.pointer = -1
+      this.showItems = false
     },
 
     pointerSet (index) {
       this.pointer = index
+      this.select()
     },
 
-    pointerForward () {
+    down () {
       if (this.pointer < this.__items.length - 1) this.pointer++
     },
 
-    pointerBackward () {
+    up () {
       if (this.pointer > 0) this.pointer--
     },
 
-    addPointerElement ({ key } = 'Enter') {
-      if (this.__items.length && key === 'Enter') {
-        const value = this.__items[this.pointer].key
-        const hasSlot = !!Object.keys(this.$scopedSlots).length
+    select ({ key } = 'Enter', item: Object) {
+      if (key !== 'Enter' && !item) return
+      const value = this.__items[this.pointer][this.searchProp]
 
-        if (hasSlot) {
-          this.onSearch(value)
-          this.$emit('vue-complete:select', value)
-        } else {
-          this.search = value
-        }
+      this.$nextTick(this.reset)
 
-        this.$nextTick(() => {
-          this.pointerReset()
-          this.showItems = false
-        })
-      }
-    },
+      if (!this.hasSlots) return this.search = value
 
-    close () {
-      this.showItems = false
+      if (this.items.length) this.onSearch(value)
+
+      if (item) this.$emit('vue-coemplete:select-item', item)
+
+      this.$emit('vue-coemplete:select', value)
     },
 
     onSearch (value: string): void {
