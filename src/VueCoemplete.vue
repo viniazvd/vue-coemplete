@@ -56,6 +56,8 @@ export default Vue.extend({
   name: 'vue-coemplete',
 
   props: {
+    value: String,
+
     placeholder: String,
 
     options: {
@@ -86,6 +88,10 @@ export default Vue.extend({
   },
 
   watch: {
+    value (value) {
+      this.search = value
+    },
+
     __items (value) {
       this.showItems = !!value.length
     }
