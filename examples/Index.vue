@@ -10,7 +10,7 @@ import WithSlots from './WithSlots.vue'
 import WithoutSlots from './WithoutSlots.vue'
 
 export default {
-  name: 'example',
+  name: 'examples',
 
   components: { WithSlots, WithoutSlots }
 }
