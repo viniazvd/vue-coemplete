@@ -2,7 +2,7 @@
   <vue-coemplete
     placeholder="Pesquisar"
     :options="options"
-    @vue-coemplete:select="value => searchValue = value"
+    @vue-coemplete:select="item => searchValue = item['key']"
   >
     <input
       class="input"
