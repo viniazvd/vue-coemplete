@@ -2,7 +2,7 @@
   <vue-coemplete
     placeholder="Pesquisar"
     :options="options"
-    @vue-complete:select="value => searchValue = value"
+    @vue-coemplete:select="value => searchValue = value"
   >
     <input
       class="input"
@@ -11,9 +11,9 @@
 
       :value="searchValue"
 
-      @keydown.down.prevent="keyboardEvents.pointerForward"
-      @keydown.up.prevent="keyboardEvents.pointerBackward"
-      @keydown.enter.tab.stop.self="keyboardEvents.addPointerElement"
+      @keydown.up.prevent="keyboardEvents.up"
+      @keydown.down.prevent="keyboardEvents.down"
+      @keydown.enter.tab.stop.self="keyboardEvents.select"
 
       @input="event => onInput(event.target.value, onSearch)"
     />
