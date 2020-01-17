@@ -18,7 +18,7 @@
       </slot>
     </div>
 
-    <div v-show="search && showItems" class="list-wrapper">
+    <div v-show="(search || value) && showItems" class="list-wrapper">
       <div class="list">
         <component
           v-for="(item, index) in __items"
