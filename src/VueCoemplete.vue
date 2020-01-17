@@ -1,6 +1,6 @@
 <template>
   <div class="vue-coemplete" :style="border" v-click-outside="reset" @keyup.esc="reset">
-    <div class="search-wrapper">
+    <div class="search-wrapper" @click="showItems = !showItems">
       <slot
         name="input"
         :on-search="onSearch"
@@ -20,7 +20,7 @@
       </slot>
     </div>
 
-    <div v-show="showItems" class="list-wrapper">
+    <div v-show="showItems && __items.length" class="list-wrapper">
       <div class="list">
         <div
           v-for="(item, index) in __items"
@@ -82,12 +82,6 @@ export default Vue.extend({
       internalItems: [] as Item[],
       search: '' as string,
       showItems: false as boolean
-    }
-  },
-
-  watch: {
-    search () {
-      this.showItems = !!this.__items.length
     }
   },
 
