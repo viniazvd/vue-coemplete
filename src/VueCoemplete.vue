@@ -121,6 +121,7 @@ export default Vue.extend({
     reset () {
       // pointer reset
       this.pointer = -1
+
       this.showItems = false
     },
 
@@ -139,17 +140,19 @@ export default Vue.extend({
 
     select ({ key } = 'Enter', item: Object) {
       if (key !== 'Enter' && !item) return
-      const value = this.__items[this.pointer][this.searchProp]
+
+      const item = this.__items[this.pointer]
 
       this.$nextTick(this.reset)
 
-      if (!this.hasSlots) return this.search = value
+      if (!this.hasSlots) {
+        const value = item[this.searchProp]
 
-      if (this.items.length) this.onSearch(value)
+        this.search = value
+        this.onSearch(value)
+      }
 
-      if (item) this.$emit('vue-coemplete:select-item', item)
-
-      this.$emit('vue-coemplete:select', value)
+      this.$emit('vue-coemplete:select', item)
     },
 
     onSearch (value: string): void {
