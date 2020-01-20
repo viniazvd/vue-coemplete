@@ -90,10 +90,8 @@ export default Vue.extend({
   watch: {
     value (value) {
       this.search = value
-    },
 
-    __items (value) {
-      this.showItems = !!value.length
+      this.showItems = !!this.__items.length
     }
   },
 
