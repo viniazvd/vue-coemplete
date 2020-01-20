@@ -2,10 +2,13 @@
   <vue-coemplete
     placeholder="Pesquisar"
     :options="options"
+    @vue-coemplete:focus="setFocus"
     @vue-coemplete:select="item => searchValue = item['key']"
   >
     <input
       class="input"
+      ref="inputSlot"
+
       slot="input"
       slot-scope="{ onSearch, keyboardEvents }"
 
@@ -42,6 +45,10 @@ export default {
   },
 
   methods: {
+    setFocus () {
+      this.$refs.inputSlot.focus()
+    },
+
     onInput (value, onSearch) {
       this.searchValue = value
       onSearch(this.searchValue)
