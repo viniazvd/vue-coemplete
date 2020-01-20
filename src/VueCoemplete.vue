@@ -90,8 +90,6 @@ export default Vue.extend({
   watch: {
     value (value) {
       this.search = value
-
-      this.showItems = !!this.__items.length
     }
   },
 
@@ -99,7 +97,7 @@ export default Vue.extend({
     border () {
       return {
         'border-radius': this.__items.length && this.showItems
-          ? '20px 20px 5px 5px'
+          ? '20px 20px 0 0'
           : '20px'
       }
     },
@@ -148,6 +146,7 @@ export default Vue.extend({
 
     onSearch (value: string): void {
       this.search = value
+      this.showItems = true
 
       const results = inclusiveSearch(this.options, this.search, this.searchProp)
 
@@ -189,7 +188,9 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
 
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+
+  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);
 
   & > .search-wrapper {
     display: flex;
@@ -214,36 +215,35 @@ export default Vue.extend({
   & > .list-wrapper {
     display: flex;
 
-    // 40 = input size
-    max-height: calc(285px - 40px);
+    position: absolute;
+    left: 0;
+    top: 100%;
+
+    width: 100%;
+    z-index: 10;
+    background: white;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);
+    max-height: calc(285px - 40px); // 40 = input size
 
     & > .list {
+      width: 100%;
       font-size: 14px;
-
-      display: flex;
-      flex-direction: column;
-      flex-basis: 100%;
-
       overflow-y: auto;
 
       & > .item {
-        display: flex;
-        flex-shrink: 0;
-        align-items: center;
-
-        height: 40px;
         opacity: 0.8;
         color: #121E48;
         padding: 0 15px;
         font-size: 14px;
-        line-height: 19px;
+        line-height: 40px;
+        box-sizing: border-box;
 
         cursor: pointer;
 
         overflow-x: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        max-width: calc(100% - 10px);
 
         &.-active { background-color: rgba(18, 30, 72, 0.05); }
       }
