@@ -18,7 +18,7 @@
       @input="event => onInput(event.target.value, onSearch)"
     />
 
-    <div slot="after" slot-scope="{ item }"> - {{ item.area }}</div>
+    <span slot="after" slot-scope="{ item }"> - {{ item.area }}</span>
   </vue-coemplete>
 </template>
 
