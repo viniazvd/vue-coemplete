@@ -1,5 +1,12 @@
 <template>
-  <div class="vue-coemplete" :style="border" v-click-outside="reset" @keyup.esc="reset">
+  <div
+    :style="border"
+    :class="['vue-coemplete', { '--is-opened': isOpened }]"
+
+    v-click-outside="reset"
+
+    @keyup.esc="reset"
+  >
     <div class="search-wrapper" @click="showItems = !showItems">
       <slot
         name="input"
@@ -20,7 +27,7 @@
       </slot>
     </div>
 
-    <div v-show="showItems && __items.length" class="list-wrapper">
+    <div v-show="isOpened" class="list-wrapper">
       <div class="list">
         <div
           v-for="(item, index) in __items"
@@ -96,7 +103,7 @@ export default Vue.extend({
   computed: {
     border () {
       return {
-        'border-radius': this.__items.length && this.showItems
+        'border-radius': this.isOpened
           ? '20px 20px 0 0'
           : '20px'
       }
@@ -104,6 +111,10 @@ export default Vue.extend({
 
     hasSlots () {
       return !!Object.keys(this.$scopedSlots).length
+    },
+
+    isOpened () {
+      return this.showItems && this.__items.length
     },
 
     __items () {
