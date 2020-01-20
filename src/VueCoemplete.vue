@@ -97,7 +97,7 @@ export default Vue.extend({
     border () {
       return {
         'border-radius': this.__items.length && this.showItems
-          ? '20px 20px 5px 5px'
+          ? '20px 20px 0 0'
           : '20px'
       }
     },
@@ -190,6 +190,7 @@ export default Vue.extend({
 
   position: relative;
 
+  background: white;
   box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);
 
   & > .search-wrapper {
