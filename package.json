@@ -1,6 +1,6 @@
 {
   "name": "vue-coemplete",
-  "version": "0.2.2",
+  "version": "0.2.21",
   "files": [
     "dist/"
   ],
@@ -8,9 +8,9 @@
   "module": "dist/index.esm.js",
   "license": "MIT",
   "scripts": {
-    "serve": "yarn build && poi --serve examples/main.js",
+    "postbuild": "poi",
     "build": "rollup -c",
-    "postbuild": "poi"
+    "dev": "yarn build && poi --serve examples/main.js"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
