@@ -14,6 +14,7 @@
         :keyboard-events="{ up, down, select }">
 
         <input
+          ref="input"
           class="input"
 
           :value="search"
@@ -51,6 +52,12 @@
 import Vue from 'vue'
 import clickOutside from './clickOutside'
 import inclusiveSearch from './inclusiveSearch'
+
+function bindEvent (el, event, callback, ...options) {
+  el.addEventListener(event, callback, ...options)
+
+  return () => el.removeEventListener(event, callback, ...options)
+}
 
 interface Item {
   [key: string]: string
@@ -98,6 +105,10 @@ export default Vue.extend({
     value (value) {
       this.search = value
     }
+  },
+
+  mounted () {
+    bindEvent(document, 'visibilitychange', this.onVisibilityChange)
   },
 
   computed: {
@@ -162,6 +173,16 @@ export default Vue.extend({
       const results = inclusiveSearch(this.options, this.search, this.searchProp)
 
       this.internalItems = results
+    },
+
+    onVisibilityChange () {
+      if (document.visibilityState !== 'visible') return
+
+      this.$emit('vue-coemplete:focus')
+
+      if (!this.$refs.input) return
+
+      this.$refs.input.focus()
     },
 
     setHightlight (item: string, index: number): void {
