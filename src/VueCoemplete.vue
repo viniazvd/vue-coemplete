@@ -97,7 +97,7 @@ export default Vue.extend({
     border () {
       return {
         'border-radius': this.__items.length && this.showItems
-          ? '20px 20px 0 0'
+          ? '20px 20px 5px 5px'
           : '20px'
       }
     },
