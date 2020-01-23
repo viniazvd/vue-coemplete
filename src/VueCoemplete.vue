@@ -207,7 +207,7 @@ export default Vue.extend({
             B_TAG.innerHTML += chunk
             el.appendChild(B_TAG)
 
-            if (chunk && !hasBefore && hasAfter) el.innerHTML += this.search
+            if (chunk && hasAfter) el.innerHTML += this.search
           })
       })
     }
