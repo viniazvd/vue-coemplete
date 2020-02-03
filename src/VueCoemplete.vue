@@ -176,9 +176,9 @@ export default Vue.extend({
     },
 
     onVisibilityChange () {
-      if (document.visibilityState !== 'visible') return
+      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'
 
-      this.$emit('vue-coemplete:focus')
+      this.$emit(`vue-coemplete:${action}`)
 
       if (!this.$refs.input) return
 
