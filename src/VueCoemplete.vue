@@ -40,7 +40,7 @@
           @mouseenter.self="pointer = index"
         >
           <slot name="sufix" :item="item" />
-          <span :ref="index" class="text">{{ setHightlight(item[searchProp], index) }}</span>
+          <span :ref="index" class="text">{{ setHightlight(item, index) }}</span>
           <slot name="after" :item="item" />
         </div>
       </div>
@@ -50,14 +50,13 @@
 
 <script lang="ts">
 import Vue from 'vue'
+
 import clickOutside from './clickOutside'
-import inclusiveSearch from './inclusiveSearch'
 
-function bindEvent (el, event, callback, ...options) {
-  el.addEventListener(event, callback, ...options)
-
-  return () => el.removeEventListener(event, callback, ...options)
-}
+import bindEvent from './utils/bindEvent'
+import getDiacritic from './utils/getDiacritic'
+import inclusiveSearch from './utils/inclusiveSearch'
+import normalizeDiacritics from './utils/normalizeDiacritics'
 
 interface Item {
   [key: string]: string
@@ -87,6 +86,11 @@ export default Vue.extend({
     searchProp: {
       type: String,
       default: 'key'
+    },
+
+    normalizeProp: {
+      type: String,
+      default: 'normalized'
     }
   },
 
@@ -170,7 +174,7 @@ export default Vue.extend({
       this.search = value
       this.showItems = true
 
-      const results = inclusiveSearch(this.options, this.search, this.searchProp)
+      const results = inclusiveSearch(this.options, normalizeDiacritics(this.search), this.normalizeProp)
 
       this.internalItems = results
     },
@@ -193,21 +197,22 @@ export default Vue.extend({
 
         // reset data
         el.innerHTML = ''
+        const typed = getDiacritic(item, 'key', normalizeDiacritics(this.search), item[this.normalizeProp])
 
-        item
-          .split(this.search)
+        item[this.searchProp]
+          .split(typed)
           .forEach((chunk: string, i: number, array: string[]) => {
             const hasAfter: Boolean = !!array[i + 1]
             const hasBefore: Boolean = !!array[i - 1]
             const B_TAG: HTMLElement = document.createElement('b')
 
-            if (!chunk) el.innerHTML += this.search
-            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = this.search
+            if (!chunk) el.innerHTML += typed
+            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed
 
             B_TAG.innerHTML += chunk
             el.appendChild(B_TAG)
 
-            if (chunk && hasAfter) el.innerHTML += this.search
+            if (chunk && hasAfter) el.innerHTML += typed
           })
       })
     }
