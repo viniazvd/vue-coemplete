@@ -1,10 +1,14 @@
-import contains from './contains'
+import getRemaining from './getRemaining'
 
 function getDiacritic (obj, key, word, words) {
-  const remaining = contains(word, words)
-  const chunk = obj[key].slice(0, -remaining)
+  const { atBeginning, remaining } = getRemaining(word, words)
+  const endSlice = remaining + word.length
 
-  return remaining ? chunk : obj[key]
+  if (word === words) return obj[key]
+
+  return atBeginning
+    ? obj[key].slice(0, remaining)
+    : obj[key].slice(remaining, endSlice)
 }
 
 export default getDiacritic
