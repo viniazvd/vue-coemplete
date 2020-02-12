@@ -197,7 +197,7 @@ export default Vue.extend({
 
         // reset data
         el.innerHTML = ''
-        const typed = getDiacritic(item, 'key', normalizeDiacritics(this.search), item[this.normalizeProp])
+        const typed = getDiacritic(item, this.searchProp, normalizeDiacritics(this.search), item[this.normalizeProp])
 
         item[this.searchProp]
           .split(typed)
