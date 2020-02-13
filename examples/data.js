@@ -1,5 +1,3 @@
-import normalizeDiacritics from '../src/utils/normalizeDiacritics'
-
 export default [
   {
     key: 'cep',
@@ -376,7 +374,4 @@ export default [
     route: 'Detalhes pessoais do colaborador',
     selector: '@label-adquirido-pelo-fgts'
   }
-].map(option => ({
-  ...option,
-  normalized: normalizeDiacritics(option.key)
-}))
+]
