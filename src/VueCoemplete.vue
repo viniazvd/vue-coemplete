@@ -28,23 +28,16 @@
       </slot>
     </div>
 
-    <div v-show="isOpened" class="list-wrapper">
-      <div class="list">
-        <div
-          v-for="(item, index) in __items"
-
-          :key="index"
-          :class="['item', { '-active': index === pointer }]"
-
-          @click="select({ key: 'Click' })"
-          @mouseenter.self="pointer = index"
-        >
-          <slot name="sufix" :item="item" />
-          <span :ref="index" class="text">{{ setHightlight(item, index) }}</span>
-          <slot name="after" :item="item" />
-        </div>
-      </div>
-    </div>
+    <item-list
+      v-show="isOpened"
+      :items="__items"
+      :search="search"
+      :diacritic="diacritic"
+      :search-prop="searchProp"
+      :normalize-prop="normalizeProp"
+      @vue-coemplete-list="select({ key: 'Click' })"
+      @vue-coemplete-mouseenter="index => pointer = index"
+    />
   </div>
 </template>
 
@@ -54,9 +47,11 @@ import Vue from 'vue'
 import clickOutside from './clickOutside'
 
 import bindEvent from './utils/bindEvent'
-import getDiacritic from './utils/getDiacritic'
+import setDiacritic from './utils/setDiacritic'
 import inclusiveSearch from './utils/inclusiveSearch'
 import normalizeDiacritics from './utils/normalizeDiacritics'
+
+import ItemList from './components/ItemList.vue'
 
 interface Item {
   [key: string]: string
@@ -67,6 +62,8 @@ interface Item {
 
 export default Vue.extend({
   name: 'vue-coemplete',
+
+  components: { ItemList },
 
   props: {
     value: String,
@@ -82,6 +79,8 @@ export default Vue.extend({
       type: Array as () => Item[],
       default: () => []
     },
+
+    diacritic: Boolean,
 
     searchProp: {
       type: String,
@@ -101,13 +100,21 @@ export default Vue.extend({
       search: '' as string,
       pointer: -1 as number,
       showItems: false as boolean,
-      internalItems: [] as Item[]
+      internalItems: [] as Item[],
+      internalOptions: [] as any
     }
   },
 
   watch: {
     value (value) {
       this.search = value
+    },
+
+    options: {
+      handler () {
+        this.updateOptions()
+      },
+      immediate: true
     }
   },
 
@@ -116,7 +123,7 @@ export default Vue.extend({
   },
 
   computed: {
-    border () {
+    border (): object {
       return {
         'border-radius': this.isOpened
           ? '20px 20px 0 0'
@@ -124,18 +131,20 @@ export default Vue.extend({
       }
     },
 
-    hasSlots () {
+    hasSlots (): boolean {
       return !!Object.keys(this.$scopedSlots).length
     },
 
-    isOpened () {
+    isOpened (): boolean {
       return this.showItems && this.__items.length
     },
 
-    __items () {
-      if (this.items.length) return this.items
+    __items (): object[] {
+      const items = this.items.length ? this.items : this.internalItems
 
-      return this.internalItems
+      if (!this.diacritic) return items
+
+      return setDiacritic(items, this.normalizeProp, this.searchProp)
     }
   },
 
@@ -153,7 +162,7 @@ export default Vue.extend({
       if (this.pointer > 0) this.pointer--
     },
 
-    select ({ key } = 'Enter') {
+    select ({ key } = 'Enter'): void {
       if (key !== 'Enter' && key !== 'Click') return
 
       const item = this.__items[this.pointer]
@@ -170,16 +179,23 @@ export default Vue.extend({
       this.$emit('vue-coemplete:select', item)
     },
 
+    updateOptions (): void {
+      this.internalOptions = setDiacritic(this.options, this.normalizeProp, this.searchProp)
+    },
+
     onSearch (value: string): void {
       this.search = value
       this.showItems = true
 
-      const results = inclusiveSearch(this.options, normalizeDiacritics(this.search), this.normalizeProp)
+      const query = normalizeDiacritics(this.search)
+      const key = this.diacritic ? this.normalizeProp : this.searchProp
+
+      const results = inclusiveSearch(this.internalOptions, query, key)
 
       this.internalItems = results
     },
 
-    onVisibilityChange () {
+    onVisibilityChange (): void {
       const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'
 
       this.$emit(`vue-coemplete:${action}`)
@@ -187,34 +203,6 @@ export default Vue.extend({
       if (!this.$refs.input) return
 
       this.$refs.input.focus()
-    },
-
-    setHightlight (item: string, index: number): void {
-      // reason: wait for loop items to render/assemble to use $refs
-      this.$nextTick(() => {
-        const itemRef: { [key: number]: any } = this.$refs[index]
-        const el: HTMLSpanElement = itemRef[0]
-
-        // reset data
-        el.innerHTML = ''
-        const typed = getDiacritic(item, this.searchProp, normalizeDiacritics(this.search), item[this.normalizeProp])
-
-        item[this.searchProp]
-          .split(typed)
-          .forEach((chunk: string, i: number, array: string[]) => {
-            const hasAfter: Boolean = !!array[i + 1]
-            const hasBefore: Boolean = !!array[i - 1]
-            const B_TAG: HTMLElement = document.createElement('b')
-
-            if (!chunk) el.innerHTML += typed
-            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed
-
-            B_TAG.innerHTML += chunk
-            el.appendChild(B_TAG)
-
-            if (chunk && hasAfter) el.innerHTML += typed
-          })
-      })
     }
   }
 })
@@ -228,7 +216,6 @@ export default Vue.extend({
   position: relative;
 
   background: white;
-  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);
 
   & > .search-wrapper {
     display: flex;
@@ -247,44 +234,6 @@ export default Vue.extend({
       padding-right: 40px;
       color: rgba(18, 30, 72, 0.8);
       background: rgba(18, 30, 72, 0.05);
-    }
-  }
-
-  & > .list-wrapper {
-    display: flex;
-
-    position: absolute;
-    left: 0;
-    top: 100%;
-
-    width: 100%;
-    z-index: 10;
-    background: white;
-    border-radius: 0 0 5px 5px;
-    box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);
-    max-height: calc(285px - 40px); // 40 = input size
-
-    & > .list {
-      width: 100%;
-      font-size: 14px;
-      overflow-y: auto;
-
-      & > .item {
-        opacity: 0.8;
-        color: #121E48;
-        padding: 0 15px;
-        font-size: 14px;
-        line-height: 40px;
-        box-sizing: border-box;
-
-        cursor: pointer;
-
-        overflow-x: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-
-        &.-active { background-color: rgba(18, 30, 72, 0.05); }
-      }
     }
   }
 }
