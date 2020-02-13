@@ -1,5 +1,6 @@
 <template>
   <vue-coemplete
+    diacritic
     placeholder="Pesquisar"
     :options="options"
     @vue-coemplete:focus="setFocus"
