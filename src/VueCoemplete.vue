@@ -37,9 +37,14 @@
       :diacritic="diacritic"
       :search-prop="searchProp"
       :normalize-prop="normalizeProp"
+<<<<<<< HEAD
 
       @item-list:click="select({ key: 'Click' })"
       @item-list:mouseenter="index => pointer = index"
+=======
+      @vue-coemplete-list:click="$emit('vue-coemplete-list:click')"
+      @vue-coemplete-list="select({ key: 'Click' })"
+>>>>>>> 68fa228c9904c74e21f1dddede000fa6a70a7fb0
       @vue-coemplete-mouseenter="index => pointer = index"
     >
       <slot slot="before" name="before" slot-scope="{ item }" :item="item" />
