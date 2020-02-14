@@ -30,12 +30,16 @@
 
     <item-list
       v-show="isOpened"
+
       :items="__items"
       :search="search"
+      :pointer="pointer"
       :diacritic="diacritic"
       :search-prop="searchProp"
       :normalize-prop="normalizeProp"
-      @vue-coemplete-list="select({ key: 'Click' })"
+
+      @item-list:click="select({ key: 'Click' })"
+      @item-list:mouseenter="index => pointer = index"
       @vue-coemplete-mouseenter="index => pointer = index"
     >
       <slot slot="before" name="before" slot-scope="{ item }" :item="item" />

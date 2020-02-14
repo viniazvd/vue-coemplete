@@ -7,8 +7,8 @@
         :key="index"
         :class="['item', { '-active': index === pointer }]"
 
-        @click="$emit('vue-coemplete-list:click')"
-        @mouseenter.self="$emit('vue-coemplete-list:mouseenter', index)"
+        @click="$emit('item-list:click')"
+        @mouseenter.self="$emit('item-list:mouseenter', index)"
       >
         <item :item="item" :index="index" v-bind="$attrs">
           <slot slot="before" name="before" slot-scope="{ item }" :item="item" />
