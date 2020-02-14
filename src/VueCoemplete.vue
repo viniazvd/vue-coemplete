@@ -37,7 +37,10 @@
       :normalize-prop="normalizeProp"
       @vue-coemplete-list="select({ key: 'Click' })"
       @vue-coemplete-mouseenter="index => pointer = index"
-    />
+    >
+      <slot slot="before" name="before" slot-scope="{ item }" :item="item" />
+      <slot slot="after" name="after" slot-scope="{ item }" :item="item" />
+    </item-list>
   </div>
 </template>
 

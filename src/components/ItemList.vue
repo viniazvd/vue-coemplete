@@ -10,7 +10,10 @@
         @click="$emit('vue-coemplete-list:click')"
         @mouseenter.self="$emit('vue-coemplete-list:mouseenter', index)"
       >
-        <item :item="item" :index="index" v-bind="$attrs" />
+        <item :item="item" :index="index" v-bind="$attrs">
+          <slot slot="before" name="before" slot-scope="{ item }" :item="item" />
+          <slot slot="after" name="after" slot-scope="{ item }" :item="item" />
+        </item>
       </div>
     </div>
   </div>
