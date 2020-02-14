@@ -53,12 +53,16 @@ export default Vue.extend({
           .reduce((chunks: Chunk[], split: string, i: number, splits: string[]) => {
             const hasAfter: Boolean = !!splits[i + 1]
             const hasBefore: Boolean = !!splits[i - 1]
-            let procChunks = [...chunks]
-            if (!split) procChunks.push({content: typed, bold: false})
-            if (!split && !hasBefore && !hasAfter) procChunks = [{content: typed, bold: false}]
-            procChunks.push({content: split, bold: true})
-            if (split && hasAfter) procChunks.push({content: typed, bold: false})
-            return procChunks
+            const typedChunk = {content: typed, bold: false}
+            const splitChunk = {content: split, bold: true}
+            const initialChunks = !split ? [...chunks, typedChunk] : [...chunks]
+            const preChunks = (!split && !hasBefore && !hasAfter) ?
+              [typedChunk] :
+              initialChunks
+
+           return split && hasAfter ? 
+              [...preChunks, splitChunk, typedChunk] :
+              [...preChunks, splitChunk]
           }, [])
       
       return chunks
