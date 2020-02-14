@@ -35,6 +35,7 @@
       :diacritic="diacritic"
       :search-prop="searchProp"
       :normalize-prop="normalizeProp"
+      @vue-coemplete-list:click="$emit('vue-coemplete-list:click')"
       @vue-coemplete-list="select({ key: 'Click' })"
       @vue-coemplete-mouseenter="index => pointer = index"
     >
