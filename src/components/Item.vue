@@ -51,6 +51,7 @@ export default Vue.extend({
             const hasAfter: Boolean = !!array[i + 1]
             const hasBefore: Boolean = !!array[i - 1]
             const B_TAG: HTMLElement = document.createElement('b')
+            console.log({ chunk, hasAfter, hasBefore })
 
             if (!chunk) el.innerHTML += typed
             if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed
