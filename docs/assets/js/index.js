@@ -176,11 +176,7 @@ function getWords(query) {
   return query.trim().split(' ');
 }
 
-function getMatches(word, words) {
-  return word ? words.toLowerCase().split(word.toLowerCase()).length - 1 : 0;
-}
-
-function findByInclusive(xs, query, key) {
+function findBy(xs, query, key) {
   if (xs === void 0) {
     xs = [];
   }
@@ -195,13 +191,11 @@ function findByInclusive(xs, query, key) {
 
   var words = getWords(query);
   return xs.filter(function (option) {
-    return words.every(function (word) {
-      return getMatches(word, option[key] || '');
-    });
+    return option[key].includes(query);
   });
 }
 
-function getMatches$1(word, words) {
+function getMatches(word, words) {
   if (word === void 0) {
     word = '';
   }
@@ -212,15 +206,11 @@ function getMatches$1(word, words) {
 
   var normalizedWord = normalizeDiacritics(word);
   var normalizedWords = normalizeDiacritics(words);
-  console.log({
-    normalizedWord: normalizedWord,
-    normalizedWords: normalizedWords
-  });
   return normalizedWords.toLowerCase().split(normalizedWord.toLowerCase());
 }
 
 function getRemaining(word, words) {
-  var matches = getMatches$1(word, words);
+  var matches = getMatches(word, words);
   var atBeginning = !matches[0].length;
   var remaining = (matches.filter(Boolean)[0] || []).length;
   return {
@@ -267,6 +257,11 @@ var script = Vue.extend({
           var hasAfter = !!array[i + 1];
           var hasBefore = !!array[i - 1];
           var B_TAG = document.createElement('b');
+          console.log({
+            chunk: chunk,
+            hasAfter: hasAfter,
+            hasBefore: hasBefore
+          });
           if (!chunk) el.innerHTML += typed;
           if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed;
           B_TAG.innerHTML += chunk;
@@ -444,7 +439,7 @@ __vue_render__._withStripped = true;
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-50b6d093_0", {
+  inject("data-v-2c32e673_0", {
     source: "\n\n/*# sourceMappingURL=Item.vue.map */",
     map: {
       "version": 3,
@@ -675,7 +670,7 @@ var script$2 = Vue.extend({
       this.showItems = true;
       var query = normalizeDiacritics(this.search);
       var key = this.diacritic ? this.normalizeProp : this.searchProp;
-      var results = findByInclusive(this.internalOptions, query, key);
+      var results = findBy(this.internalOptions, query, key);
       this.internalItems = results;
     },
     onVisibilityChange: function () {
@@ -803,7 +798,7 @@ __vue_render__$2._withStripped = true;
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-393490a4_0", {
+  inject("data-v-1a6033ca_0", {
     source: ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */",
     map: {
       "version": 3,
@@ -811,7 +806,7 @@ const __vue_inject_styles__$2 = function (inject) {
       "names": [],
       "mappings": "AAmNA;EACA,aAAA;EACA,sBAAA;EAEA,kBAAA;EAEA,iBAAA;ACpNA;ADsNA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;ACpNA;ADsNA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;ACpNA;;AAEA,2CAA2C",
       "file": "VueCoemplete.vue",
-      "sourcesContent": ["<template>\n  <div\n    :style=\"border\"\n    :class=\"['vue-coemplete', { '--is-opened': isOpened }]\"\n\n    v-click-outside=\"reset\"\n\n    @keyup.esc=\"reset\"\n  >\n    <div class=\"search-wrapper\" @click=\"showItems = !showItems\">\n      <slot\n        name=\"input\"\n        :on-search=\"onSearch\"\n        :keyboard-events=\"{ up, down, select }\">\n\n        <input\n          ref=\"input\"\n          class=\"input\"\n\n          :value=\"search\"\n\n          @keydown.up.prevent=\"up\"\n          @keydown.down.prevent=\"down\"\n          @keydown.enter.tab.stop.self=\"select\"\n\n          @input=\"event => onSearch(event.target.value)\"\n        />\n      </slot>\n    </div>\n\n    <item-list\n      v-show=\"isOpened\"\n      :items=\"__items\"\n      :search=\"search\"\n      :diacritic=\"diacritic\"\n      :search-prop=\"searchProp\"\n      :normalize-prop=\"normalizeProp\"\n      @vue-coemplete-list=\"select({ key: 'Click' })\"\n      @vue-coemplete-mouseenter=\"index => pointer = index\"\n    />\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\n\nimport clickOutside from './clickOutside'\n\nimport bindEvent from './utils/bindEvent'\nimport setDiacritic from './utils/setDiacritic'\nimport inclusiveSearch from './utils/inclusiveSearch'\nimport normalizeDiacritics from './utils/normalizeDiacritics'\n\nimport ItemList from './components/ItemList.vue'\n\ninterface Item {\n  [key: string]: string\n  area: string\n  route: string\n  selector: string\n}\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  components: { ItemList },\n\n  props: {\n    value: String,\n\n    placeholder: String,\n\n    options: {\n      type: Array as () => Item[],\n      default: () => []\n    },\n\n    items: {\n      type: Array as () => Item[],\n      default: () => []\n    },\n\n    diacritic: Boolean,\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    },\n\n    normalizeProp: {\n      type: String,\n      default: 'normalized'\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      search: '' as string,\n      pointer: -1 as number,\n      showItems: false as boolean,\n      internalItems: [] as Item[],\n      internalOptions: [] as any\n    }\n  },\n\n  watch: {\n    value (value) {\n      this.search = value\n    },\n\n    options: {\n      handler () {\n        this.updateOptions()\n      },\n      immediate: true\n    }\n  },\n\n  mounted () {\n    bindEvent(document, 'visibilitychange', this.onVisibilityChange)\n  },\n\n  computed: {\n    border (): object {\n      return {\n        'border-radius': this.isOpened\n          ? '20px 20px 0 0'\n          : '20px'\n      }\n    },\n\n    hasSlots (): boolean {\n      return !!Object.keys(this.$scopedSlots).length\n    },\n\n    isOpened (): boolean {\n      return this.showItems && this.__items.length\n    },\n\n    __items (): object[] {\n      const items = this.items.length ? this.items : this.internalItems\n\n      if (!this.diacritic) return items\n\n      return setDiacritic(items, this.normalizeProp, this.searchProp)\n    }\n  },\n\n  methods: {\n    reset () {\n      this.showItems = false\n      this.pointer = -1 // reset pointer\n    },\n\n    down () {\n      if (this.pointer < this.__items.length - 1) this.pointer++\n    },\n\n    up () {\n      if (this.pointer > 0) this.pointer--\n    },\n\n    select ({ key } = 'Enter'): void {\n      if (key !== 'Enter' && key !== 'Click') return\n\n      const item = this.__items[this.pointer]\n\n      this.$nextTick(this.reset)\n\n      if (!this.hasSlots) {\n        const value = item[this.searchProp]\n\n        this.search = value\n        this.onSearch(value)\n      }\n\n      this.$emit('vue-coemplete:select', item)\n    },\n\n    updateOptions (): void {\n      this.internalOptions = setDiacritic(this.options, this.normalizeProp, this.searchProp)\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n      this.showItems = true\n\n      const query = normalizeDiacritics(this.search)\n      const key = this.diacritic ? this.normalizeProp : this.searchProp\n\n      const results = inclusiveSearch(this.internalOptions, query, key)\n\n      this.internalItems = results\n    },\n\n    onVisibilityChange (): void {\n      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'\n\n      this.$emit(`vue-coemplete:${action}`)\n\n      if (!this.$refs.input) return\n\n      this.$refs.input.focus()\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background: white;\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
+      "sourcesContent": ["<template>\n  <div\n    :style=\"border\"\n    :class=\"['vue-coemplete', { '--is-opened': isOpened }]\"\n\n    v-click-outside=\"reset\"\n\n    @keyup.esc=\"reset\"\n  >\n    <div class=\"search-wrapper\" @click=\"showItems = !showItems\">\n      <slot\n        name=\"input\"\n        :on-search=\"onSearch\"\n        :keyboard-events=\"{ up, down, select }\">\n\n        <input\n          ref=\"input\"\n          class=\"input\"\n\n          :value=\"search\"\n\n          @keydown.up.prevent=\"up\"\n          @keydown.down.prevent=\"down\"\n          @keydown.enter.tab.stop.self=\"select\"\n\n          @input=\"event => onSearch(event.target.value)\"\n        />\n      </slot>\n    </div>\n\n    <item-list\n      v-show=\"isOpened\"\n      :items=\"__items\"\n      :search=\"search\"\n      :diacritic=\"diacritic\"\n      :search-prop=\"searchProp\"\n      :normalize-prop=\"normalizeProp\"\n      @vue-coemplete-list=\"select({ key: 'Click' })\"\n      @vue-coemplete-mouseenter=\"index => pointer = index\"\n    />\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\n\nimport clickOutside from './clickOutside'\n\nimport bindEvent from './utils/bindEvent'\nimport setDiacritic from './utils/setDiacritic'\nimport findBy from './utils/findBy'\nimport normalizeDiacritics from './utils/normalizeDiacritics'\n\nimport ItemList from './components/ItemList.vue'\n\ninterface Item {\n  [key: string]: string\n  area: string\n  route: string\n  selector: string\n}\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  components: { ItemList },\n\n  props: {\n    value: String,\n\n    placeholder: String,\n\n    options: {\n      type: Array as () => Item[],\n      default: () => []\n    },\n\n    items: {\n      type: Array as () => Item[],\n      default: () => []\n    },\n\n    diacritic: Boolean,\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    },\n\n    normalizeProp: {\n      type: String,\n      default: 'normalized'\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      search: '' as string,\n      pointer: -1 as number,\n      showItems: false as boolean,\n      internalItems: [] as Item[],\n      internalOptions: [] as any\n    }\n  },\n\n  watch: {\n    value (value) {\n      this.search = value\n    },\n\n    options: {\n      handler () {\n        this.updateOptions()\n      },\n      immediate: true\n    }\n  },\n\n  mounted () {\n    bindEvent(document, 'visibilitychange', this.onVisibilityChange)\n  },\n\n  computed: {\n    border (): object {\n      return {\n        'border-radius': this.isOpened\n          ? '20px 20px 0 0'\n          : '20px'\n      }\n    },\n\n    hasSlots (): boolean {\n      return !!Object.keys(this.$scopedSlots).length\n    },\n\n    isOpened (): boolean {\n      return this.showItems && this.__items.length\n    },\n\n    __items (): object[] {\n      const items = this.items.length ? this.items : this.internalItems\n\n      if (!this.diacritic) return items\n\n      return setDiacritic(items, this.normalizeProp, this.searchProp)\n    }\n  },\n\n  methods: {\n    reset () {\n      this.showItems = false\n      this.pointer = -1 // reset pointer\n    },\n\n    down () {\n      if (this.pointer < this.__items.length - 1) this.pointer++\n    },\n\n    up () {\n      if (this.pointer > 0) this.pointer--\n    },\n\n    select ({ key } = 'Enter'): void {\n      if (key !== 'Enter' && key !== 'Click') return\n\n      const item = this.__items[this.pointer]\n\n      this.$nextTick(this.reset)\n\n      if (!this.hasSlots) {\n        const value = item[this.searchProp]\n\n        this.search = value\n        this.onSearch(value)\n      }\n\n      this.$emit('vue-coemplete:select', item)\n    },\n\n    updateOptions (): void {\n      this.internalOptions = setDiacritic(this.options, this.normalizeProp, this.searchProp)\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n      this.showItems = true\n\n      const query = normalizeDiacritics(this.search)\n      const key: string = this.diacritic ? this.normalizeProp : this.searchProp\n\n      const results = findBy(this.internalOptions, query, key)\n\n      this.internalItems = results\n    },\n\n    onVisibilityChange (): void {\n      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'\n\n      this.$emit(`vue-coemplete:${action}`)\n\n      if (!this.$refs.input) return\n\n      this.$refs.input.focus()\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background: white;\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
     },
     media: undefined
   });
@@ -1091,294 +1086,342 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ([{
-  key: 'cep',
-  area: 'endereço',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-cep'
-}, {
-  key: 'endereço',
-  area: 'endereço',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-endereço'
-}, {
-  key: 'número',
-  area: 'endereço',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-número'
-}, {
-  key: 'complemento',
-  area: 'endereço',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-complemento'
-}, {
-  key: 'bairro',
-  area: 'endereço',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-bairro'
-}, {
-  key: 'uf',
-  area: 'endereço',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-uf'
-}, {
-  key: 'cidade',
-  area: 'endereço',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-cidade'
-}, {
-  key: 'celular',
-  area: 'contatos',
-  router: 'Endereços e contatos do colaborador',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-celular'
-}, {
-  key: 'telefone residencial',
-  area: 'contatos',
-  router: 'Endereços e contatos do colaborador',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-telefone-residencial'
-}, {
-  key: 'email pessoal',
-  area: 'contatos',
-  router: 'Endereços e contatos do colaborador',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-email-pessoal'
-}, {
-  key: 'relação',
-  area: 'contatos de emergência',
-  router: 'Endereços e contatos do colaborador',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-relação'
-}, {
-  key: 'telefone',
-  area: 'contatos de emergência',
-  router: 'Endereços e contatos do colaborador',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-telefone'
-}, {
-  key: 'telefone de trabalho',
-  area: 'contatos de emergência',
-  router: 'Endereços e contatos do colaborador',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-telefone de trabalho'
-}, {
-  key: 'celular',
-  area: 'contatos de emergência',
-  router: 'Endereços e contatos do colaborador',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-celular'
-}, {
-  key: 'email',
-  area: 'contatos de emergência',
-  router: 'Endereços e contatos do colaborador',
-  route: 'Endereços e contatos do colaborador',
-  selector: '@label-email'
-}, {
-  key: 'banco',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-banco'
-}, {
-  key: 'tipo de conta',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-tipo de conta'
-}, {
-  key: 'agência',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-agência'
-}, {
-  key: 'conta',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-conta'
-}, {
-  key: 'instituição de ensino',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-instituição de ensino'
-}, {
-  key: 'curso',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-curso'
-}, {
-  key: 'ano de conclusão',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-ano-de-conclusão'
-}, {
-  key: 'tipo de visto',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-tipo-de-visto'
-}, {
-  key: 'data de chegada',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-data-de-chegada'
-}, {
-  key: 'data de naturalização',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-data-de-naturalização'
-}, {
-  key: 'país de origem',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-país de origem'
-}, {
-  key: 'casado com brasileiro',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-casado-com-brasileiro'
-}, {
-  key: 'gênero',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-gênero'
-}, {
-  key: 'possui alguma deficiência',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-possui-alguma-deficiência'
-}, {
-  key: 'tipo',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-tipo'
-}, {
-  key: 'observações',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-observações'
-}, {
-  key: 'nome completo',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-nome-completo'
-}, {
-  key: 'nacionalidade',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-nacionalidade'
-}, {
-  key: 'uf natal',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-uf-natal'
-}, {
+/* harmony default export */ __webpack_exports__["default"] = ([// {
+//   key: 'cep',
+//   area: 'endereço',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-cep'
+// },
+// {
+//   key: 'endereço',
+//   area: 'endereço',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-endereço'
+// },
+// {
+//   key: 'número',
+//   area: 'endereço',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-número'
+// },
+// {
+//   key: 'complemento',
+//   area: 'endereço',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-complemento'
+// },
+// {
+//   key: 'bairro',
+//   area: 'endereço',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-bairro'
+// },
+// {
+//   key: 'uf',
+//   area: 'endereço',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-uf'
+// },
+// {
+//   key: 'cidade',
+//   area: 'endereço',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-cidade'
+// },
+// {
+//   key: 'celular',
+//   area: 'contatos',
+//   router: 'Endereços e contatos do colaborador',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-celular'
+// },
+// {
+//   key: 'telefone residencial',
+//   area: 'contatos',
+//   router: 'Endereços e contatos do colaborador',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-telefone-residencial'
+// },
+// {
+//   key: 'email pessoal',
+//   area: 'contatos',
+//   router: 'Endereços e contatos do colaborador',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-email-pessoal'
+// },
+// {
+//   key: 'relação',
+//   area: 'contatos de emergência',
+//   router: 'Endereços e contatos do colaborador',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-relação'
+// },
+// {
+//   key: 'telefone',
+//   area: 'contatos de emergência',
+//   router: 'Endereços e contatos do colaborador',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-telefone'
+// },
+// {
+//   key: 'telefone de trabalho',
+//   area: 'contatos de emergência',
+//   router: 'Endereços e contatos do colaborador',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-telefone de trabalho'
+// },
+// {
+//   key: 'celular',
+//   area: 'contatos de emergência',
+//   router: 'Endereços e contatos do colaborador',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-celular'
+// },
+// {
+//   key: 'email',
+//   area: 'contatos de emergência',
+//   router: 'Endereços e contatos do colaborador',
+//   route: 'Endereços e contatos do colaborador',
+//   selector: '@label-email'
+// },
+// {
+//   key: 'banco',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-banco'
+// },
+// {
+//   key: 'tipo de conta',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-tipo de conta'
+// },
+// {
+//   key: 'agência',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-agência'
+// },
+// {
+//   key: 'conta',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-conta'
+// },
+// {
+//   key: 'instituição de ensino',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-instituição de ensino'
+// },
+// {
+//   key: 'curso',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-curso'
+// },
+// {
+//   key: 'ano de conclusão',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-ano-de-conclusão'
+// },
+// {
+//   key: 'tipo de visto',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-tipo-de-visto'
+// },
+// {
+//   key: 'data de chegada',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-data-de-chegada'
+// },
+// {
+//   key: 'data de naturalização',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-data-de-naturalização'
+// },
+// {
+//   key: 'país de origem',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-país de origem'
+// },
+// {
+//   key: 'casado com brasileiro',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-casado-com-brasileiro'
+// },
+// {
+//   key: 'gênero',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-gênero'
+// },
+// {
+//   key: 'possui alguma deficiência',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-possui-alguma-deficiência'
+// },
+// {
+//   key: 'tipo',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-tipo'
+// },
+// {
+//   key: 'observações',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-observações'
+// },
+// {
+//   key: 'nome completo',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-nome-completo'
+// },
+// {
+//   key: 'nacionalidade',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-nacionalidade'
+// },
+// {
+//   key: 'uf natal',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-uf-natal'
+// },
+{
   key: 'cidade natal',
   area: 'informações pessoais',
   router: 'Detalhes pessoais do colaborador',
   route: 'Detalhes pessoais do colaborador',
   selector: '@label-cidade-natal'
-}, {
-  key: 'cor raça',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-cor-raça'
-}, {
-  key: 'gênero',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-gênero'
-}, {
-  key: 'nome social',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-nome-social'
-}, {
-  key: 'estado civil',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-estado-civil'
-}, {
-  key: 'data de nascimento',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-data-de-nascimento'
-}, {
-  key: 'nome da mãe',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-nome-da-mãe'
-}, {
-  key: 'nome do pai',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-nome-do-pai'
-}, {
-  key: 'data de nascimento',
-  area: 'dependentes',
-  router: 'Dependentes do colaborador',
-  route: 'Dependentes do colaborador',
-  selector: '@label-data-de-nascimento'
-}, {
-  key: 'cpf',
-  area: 'dependentes',
-  router: 'Dependentes do colaborador',
-  route: 'Dependentes do colaborador',
-  selector: '@label-cpf'
-}, {
-  key: 'contato',
-  area: 'dependentes',
-  router: 'Dependentes do colaborador',
-  route: 'Dependentes do colaborador',
-  selector: '@label-contato'
-}, {
-  key: 'email',
-  area: 'dependentes',
-  router: 'Dependentes do colaborador',
-  route: 'Dependentes do colaborador',
-  selector: '@label-e-mail'
-}, {
-  key: 'observações',
-  area: 'dependentes',
-  router: 'Dependentes do colaborador',
-  route: 'Dependentes do colaborador',
-  selector: '@label-observações'
-}, {
-  key: 'possui imovel proprio',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-possui-imovel-proprio'
-}, {
-  key: 'adquirido pelo fgts',
-  area: 'informações pessoais',
-  router: 'Detalhes pessoais do colaborador',
-  route: 'Detalhes pessoais do colaborador',
-  selector: '@label-adquirido-pelo-fgts'
-}]);
+} // {
+//   key: 'cor raça',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-cor-raça'
+// },
+// {
+//   key: 'gênero',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-gênero'
+// },
+// {
+//   key: 'nome social',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-nome-social'
+// },
+// {
+//   key: 'estado civil',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-estado-civil'
+// },
+// {
+//   key: 'data de nascimento',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-data-de-nascimento'
+// },
+// {
+//   key: 'nome da mãe',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-nome-da-mãe'
+// },
+// {
+//   key: 'nome do pai',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-nome-do-pai'
+// },
+// {
+//   key: 'data de nascimento',
+//   area: 'dependentes',
+//   router: 'Dependentes do colaborador',
+//   route: 'Dependentes do colaborador',
+//   selector: '@label-data-de-nascimento'
+// },
+// {
+//   key: 'cpf',
+//   area: 'dependentes',
+//   router: 'Dependentes do colaborador',
+//   route: 'Dependentes do colaborador',
+//   selector: '@label-cpf'
+// },
+// {
+//   key: 'contato',
+//   area: 'dependentes',
+//   router: 'Dependentes do colaborador',
+//   route: 'Dependentes do colaborador',
+//   selector: '@label-contato'
+// },
+// {
+//   key: 'email',
+//   area: 'dependentes',
+//   router: 'Dependentes do colaborador',
+//   route: 'Dependentes do colaborador',
+//   selector: '@label-e-mail'
+// },
+// {
+//   key: 'observações',
+//   area: 'dependentes',
+//   router: 'Dependentes do colaborador',
+//   route: 'Dependentes do colaborador',
+//   selector: '@label-observações'
+// },
+// {
+//   key: 'possui imovel proprio',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-possui-imovel-proprio'
+// },
+// {
+//   key: 'adquirido pelo fgts',
+//   area: 'informações pessoais',
+//   router: 'Detalhes pessoais do colaborador',
+//   route: 'Detalhes pessoais do colaborador',
+//   selector: '@label-adquirido-pelo-fgts'
+// }
+]);
 
 /***/ }),
 
