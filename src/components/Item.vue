@@ -1,7 +1,13 @@
 <template>
   <div class="text-wrapper">
     <slot name="sufix" :item="item" />
-    <span :ref="index" class="text">{{ setHightlight() }}</span>
+    <span :ref="index" class="text">
+      <component 
+        v-for="(chunk, key) in chunks" 
+        :key="key"
+        :is="chunk.bold ? 'b' : 'span'"
+      >{{ chunk.content }}</component>
+    </span>
     <slot name="after" :item="item" />
   </div>
 </template>
@@ -11,6 +17,11 @@ import getDiacritic from '../utils/getDiacritic'
 import normalizeDiacritics from '../utils/normalizeDiacritics'
 
 import Vue from 'vue'
+
+interface Chunk {
+  content: string,
+  bold: boolean,
+}
 
 export default Vue.extend({
   name: 'item',
@@ -32,35 +43,25 @@ export default Vue.extend({
     search: String
   },
 
-  methods: {
-    setHightlight (): void {
-      // reason: wait for loop items to render/assemble to use $refs
-      this.$nextTick(() => {
-        const el: { [key: number]: HTMLSpanElement } = this.$refs[this.index]
-
-        // reset data
-        el.innerHTML = ''
-
-        const typed = !this.diacritic
-          ? this.search
-          : getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp])
-
-        this.item[this.searchProp]
+  computed: {
+    chunks () : Chunk[] {
+      const typed = !this.diacritic
+        ? this.search
+        : getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp])
+      const chunks = this.item[this.searchProp]
           .split(typed)
-          .forEach((chunk: string, i: number, array: string[]) => {
-            const hasAfter: Boolean = !!array[i + 1]
-            const hasBefore: Boolean = !!array[i - 1]
-            const B_TAG: HTMLElement = document.createElement('b')
-
-            if (!chunk) el.innerHTML += typed
-            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed
-
-            B_TAG.innerHTML += chunk
-            el.appendChild(B_TAG)
-
-            if (chunk && hasAfter) el.innerHTML += typed
-          })
-      })
+          .reduce((chunks: Chunk[], split: string, i: number, splits: string[]) => {
+            const hasAfter: Boolean = !!splits[i + 1]
+            const hasBefore: Boolean = !!splits[i - 1]
+            let procChunks = [...chunks]
+            if (!split) procChunks.push({content: typed, bold: false})
+            if (!split && !hasBefore && !hasAfter) procChunks = [{content: typed, bold: false}]
+            procChunks.push({content: split, bold: true})
+            if (split && hasAfter) procChunks.push({content: typed, bold: false})
+            return procChunks
+          }, [])
+      
+      return chunks
     }
   }
 })
