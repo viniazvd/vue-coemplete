@@ -159,6 +159,14 @@ var __assign = function () {
   return __assign.apply(this, arguments);
 };
 
+function __spreadArrays() {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) r[k] = a[j];
+
+  return r;
+}
+
 function normalizeDiacritics(value) {
   if (!value) return '';
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -252,28 +260,25 @@ var script = Vue.extend({
     index: Number,
     search: String
   },
-  methods: {
-    setHightlight: function () {
-      var _this = this; // reason: wait for loop items to render/assemble to use $refs
-
-
-      this.$nextTick(function () {
-        var el = _this.$refs[_this.index]; // reset data
-
-        el.innerHTML = '';
-        var typed = !_this.diacritic ? _this.search : getDiacritic(_this.item, _this.searchProp, normalizeDiacritics(_this.search), _this.item[_this.normalizeProp]);
-
-        _this.item[_this.searchProp].split(typed).forEach(function (chunk, i, array) {
-          var hasAfter = !!array[i + 1];
-          var hasBefore = !!array[i - 1];
-          var B_TAG = document.createElement('b');
-          if (!chunk) el.innerHTML += typed;
-          if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed;
-          B_TAG.innerHTML += chunk;
-          el.appendChild(B_TAG);
-          if (chunk && hasAfter) el.innerHTML += typed;
-        });
-      });
+  computed: {
+    chunks: function () {
+      var typed = !this.diacritic ? this.search : getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp]);
+      var chunks = this.item[this.searchProp].split(typed).reduce(function (chunks, split, i, splits) {
+        var hasAfter = !!splits[i + 1];
+        var hasBefore = !!splits[i - 1];
+        var typedChunk = {
+          content: typed,
+          bold: false
+        };
+        var splitChunk = {
+          content: split,
+          bold: true
+        };
+        var initialChunks = !split ? __spreadArrays(chunks, [typedChunk]) : __spreadArrays(chunks);
+        var preChunks = !split && !hasBefore && !hasAfter ? [typedChunk] : initialChunks;
+        return split && hasAfter ? __spreadArrays(preChunks, [splitChunk, typedChunk]) : __spreadArrays(preChunks, [splitChunk]);
+      }, []);
+      return chunks;
     }
   }
 });
@@ -433,7 +438,12 @@ var __vue_render__ = function () {
   }), _vm._v(" "), _c("span", {
     ref: _vm.index,
     staticClass: "text"
-  }, [_vm._v(_vm._s(_vm.setHightlight()))]), _vm._v(" "), _vm._t("after", null, {
+  }, _vm._l(_vm.chunks, function (chunk, key) {
+    return _c(chunk.bold ? "b" : "span", {
+      key: key,
+      tag: "component"
+    }, [_vm._v(_vm._s(chunk.content))]);
+  }), 1), _vm._v(" "), _vm._t("after", null, {
     item: _vm.item
   })], 2);
 };
@@ -444,7 +454,7 @@ __vue_render__._withStripped = true;
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-50b6d093_0", {
+  inject("data-v-086c4e07_0", {
     source: "\n\n/*# sourceMappingURL=Item.vue.map */",
     map: {
       "version": 3,
@@ -536,11 +546,11 @@ __vue_render__$1._withStripped = true;
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-4a1c5488_0", {
+  inject("data-v-f3367f6e_0", {
     source: ".list-wrapper {\n  display: flex;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px);\n}\n.list-wrapper > .list {\n  width: 100%;\n  font-size: 14px;\n  overflow-y: auto;\n}\n.list-wrapper > .list > .item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  box-sizing: border-box;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.list-wrapper > .list > .item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=ItemList.vue.map */",
     map: {
       "version": 3,
-      "sources": ["/Users/convenia/Desktop/convenia-spa/vue-coemplete/src/components/ItemList.vue", "ItemList.vue"],
+      "sources": ["/home/tales/forks/vue-coemplete/src/components/ItemList.vue", "ItemList.vue"],
       "names": [],
       "mappings": "AAqCA;EACA,aAAA;EAEA,kBAAA;EACA,OAAA;EACA,SAAA;EAEA,WAAA;EACA,WAAA;EACA,iBAAA;EACA,0BAAA;EACA,6CAAA;EACA,8BAAA;ACtCA;ADwCA;EACA,WAAA;EACA,eAAA;EACA,gBAAA;ACtCA;ADwCA;EACA,YAAA;EACA,cAAA;EACA,eAAA;EACA,eAAA;EACA,iBAAA;EACA,sBAAA;EAEA,eAAA;EAEA,kBAAA;EACA,mBAAA;EACA,uBAAA;ACxCA;AD0CA;EAAA,wCAAA;ACvCA;;AAEA,uCAAuC",
       "file": "ItemList.vue",
@@ -803,11 +813,11 @@ __vue_render__$2._withStripped = true;
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-393490a4_0", {
+  inject("data-v-3a90e8cd_0", {
     source: ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */",
     map: {
       "version": 3,
-      "sources": ["/Users/convenia/Desktop/convenia-spa/vue-coemplete/src/VueCoemplete.vue", "VueCoemplete.vue"],
+      "sources": ["/home/tales/forks/vue-coemplete/src/VueCoemplete.vue", "VueCoemplete.vue"],
       "names": [],
       "mappings": "AAmNA;EACA,aAAA;EACA,sBAAA;EAEA,kBAAA;EAEA,iBAAA;ACpNA;ADsNA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;ACpNA;ADsNA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;ACpNA;;AAEA,2CAA2C",
       "file": "VueCoemplete.vue",
@@ -1704,7 +1714,7 @@ __webpack_require__.r(__webpack_exports__);
 
 exports = module.exports = __webpack_require__(/*! ../node_modules/poi/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/poi/node_modules/css-loader/dist/runtime/api.js")(true);
 // Module
-exports.push([module.i, "#app {\n  display: flex;\n  justify-content: space-evenly;\n}\n", "",{"version":3,"sources":["/Users/convenia/Desktop/convenia-spa/vue-coemplete/examples/Index.vue"],"names":[],"mappings":"AAmBA;EACE,aAAa;EACb,6BAA6B;AAAA","file":"Index.vue?vue&type=style&index=0&lang=scss&","sourcesContent":["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n#app {\n  display: flex;\n  justify-content: space-evenly;\n}\n"]}]);
+exports.push([module.i, "#app {\n  display: flex;\n  justify-content: space-evenly;\n}\n", "",{"version":3,"sources":["/home/tales/forks/vue-coemplete/examples/Index.vue"],"names":[],"mappings":"AAmBA;EACE,aAAa;EACb,6BAA6B;AAAA","file":"Index.vue?vue&type=style&index=0&lang=scss&","sourcesContent":["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n#app {\n  display: flex;\n  justify-content: space-evenly;\n}\n"]}]);
 
 
 
@@ -1719,7 +1729,7 @@ exports.push([module.i, "#app {\n  display: flex;\n  justify-content: space-even
 
 exports = module.exports = __webpack_require__(/*! ../node_modules/poi/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/poi/node_modules/css-loader/dist/runtime/api.js")(true);
 // Module
-exports.push([module.i, ".input {\n  border: 0;\n  width: 100%;\n  outline: none;\n  padding-left: 20px;\n  border-radius: 20px;\n}\n", "",{"version":3,"sources":["/Users/convenia/Desktop/convenia-spa/vue-coemplete/examples/WithSlots.vue"],"names":[],"mappings":"AA6DA;EACE,SAAS;EACT,WAAW;EACX,aAAa;EACb,kBAAkB;EAClB,mBAAmB;AAAA","file":"WithSlots.vue?vue&type=style&index=0&lang=scss&","sourcesContent":["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n.input {\n  border: 0;\n  width: 100%;\n  outline: none;\n  padding-left: 20px;\n  border-radius: 20px;\n}\n"]}]);
+exports.push([module.i, ".input {\n  border: 0;\n  width: 100%;\n  outline: none;\n  padding-left: 20px;\n  border-radius: 20px;\n}\n", "",{"version":3,"sources":["/home/tales/forks/vue-coemplete/examples/WithSlots.vue"],"names":[],"mappings":"AA6DA;EACE,SAAS;EACT,WAAW;EACX,aAAa;EACb,kBAAkB;EAClB,mBAAmB;AAAA","file":"WithSlots.vue?vue&type=style&index=0&lang=scss&","sourcesContent":["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n.input {\n  border: 0;\n  width: 100%;\n  outline: none;\n  padding-left: 20px;\n  border-radius: 20px;\n}\n"]}]);
 
 
 
