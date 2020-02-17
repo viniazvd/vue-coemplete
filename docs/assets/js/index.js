@@ -172,29 +172,6 @@ function setDiacritic(items, normalizeProp, searchProp) {
   });
 }
 
-function getWords(query) {
-  return query.trim().split(' ');
-}
-
-function findBy(xs, query, key) {
-  if (xs === void 0) {
-    xs = [];
-  }
-
-  if (query === void 0) {
-    query = '';
-  }
-
-  if (key === void 0) {
-    key = '';
-  }
-
-  var words = getWords(query);
-  return xs.filter(function (option) {
-    return option[key].includes(query);
-  });
-}
-
 function getMatches(word, words) {
   if (word === void 0) {
     word = '';
@@ -210,7 +187,7 @@ function getMatches(word, words) {
 }
 
 function getRemaining(word, words) {
-  var matches = getMatches$1(word, words);
+  var matches = getMatches(word, words);
   var atBeginning = !(matches[0] || []).length;
   var remaining = (matches.filter(Boolean)[0] || []).length;
   return {
@@ -543,7 +520,7 @@ __vue_render__$1._withStripped = true;
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-6e469c66_0", {
+  inject("data-v-79579053_0", {
     source: ".list-wrapper {\n  display: flex;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px);\n}\n.list-wrapper > .list {\n  width: 100%;\n  font-size: 14px;\n  overflow-y: auto;\n}\n.list-wrapper > .list > .item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  box-sizing: border-box;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.list-wrapper > .list > .item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=ItemList.vue.map */",
     map: {
       "version": 3,
@@ -634,7 +611,7 @@ var script$2 = Vue.extend({
       var query = normalizeDiacritics(this.search);
       var key = this.diacritic ? this.normalizeProp : this.searchProp;
       var diacritic = setDiacritic(this.options, this.normalizeProp, this.searchProp);
-      return findByInclusive(diacritic, query, key);
+      return inclusiveSearch(diacritic, query, key);
     }
   },
   methods: {
@@ -705,24 +682,7 @@ var __vue_render__$2 = function () {
 
         return _vm.reset($event);
       }
-    },
-    scopedSlots: _vm._u([{
-      key: "before",
-      fn: function (ref) {
-        var item = ref.item;
-        return _vm._t("before", null, {
-          item: item
-        });
-      }
-    }, {
-      key: "after",
-      fn: function (ref) {
-        var item = ref.item;
-        return _vm._t("after", null, {
-          item: item
-        });
-      }
-    }], null, true)
+    }
   }, [_c("div", {
     staticClass: "search-wrapper",
     on: {
@@ -775,7 +735,52 @@ var __vue_render__$2 = function () {
       down: _vm.down,
       select: _vm.select
     }
-  })], 2), _vm._v(" "), _vm._v('\n<<<<<<< HEAD\n\n      @item-list:click="select({ key: \'Click\' })"\n      @item-list:mouseenter="index => pointer = index"\n=======\n      @vue-coemplete-list:click="$emit(\'vue-coemplete-list:click\')"\n      @vue-coemplete-list="select({ key: \'Click\' })"\n>>>>>>> 68fa228c9904c74e21f1dddede000fa6a70a7fb0\n      @vue-coemplete-mouseenter="index => pointer = index"\n    >\n      ')]);
+  })], 2), _vm._v(" "), _c("item-list", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.isOpened,
+      expression: "isOpened"
+    }],
+    attrs: {
+      items: _vm.__items,
+      search: _vm.search,
+      pointer: _vm.pointer,
+      diacritic: _vm.diacritic,
+      "search-prop": _vm.searchProp,
+      "normalize-prop": _vm.normalizeProp
+    },
+    on: {
+      "item-list:click": function ($event) {
+        return _vm.select({
+          key: "Click"
+        });
+      },
+      "item-list:mouseenter": function (index) {
+        return _vm.pointer = index;
+      },
+      "vue-coemplete-mouseenter": function (index) {
+        return _vm.pointer = index;
+      }
+    },
+    scopedSlots: _vm._u([{
+      key: "before",
+      fn: function (ref) {
+        var item = ref.item;
+        return _vm._t("before", null, {
+          item: item
+        });
+      }
+    }, {
+      key: "after",
+      fn: function (ref) {
+        var item = ref.item;
+        return _vm._t("after", null, {
+          item: item
+        });
+      }
+    }], null, true)
+  })], 1);
 };
 
 var __vue_staticRenderFns__$2 = [];
@@ -784,19 +789,19 @@ __vue_render__$2._withStripped = true;
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-7e81850e_0", {
+  inject("data-v-214e555e_0", {
     source: ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */",
     map: {
       "version": 3,
       "sources": ["/home/viniazvd/Área de Trabalho/convenia-spa/vue-coemplete/src/VueCoemplete.vue", "VueCoemplete.vue"],
       "names": [],
-<<<<<<< HEAD
-      "mappings": "AA+NA;EACA,aAAA;EACA,sBAAA;EAEA,kBAAA;EAEA,iBAAA;AChOA;ADkOA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;AChOA;ADkOA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;AChOA;;AAEA,2CAA2C",
+      "mappings": "AAmMA;EACA,aAAA;EACA,sBAAA;EAEA,kBAAA;EAEA,iBAAA;ACpMA;ADsMA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;ACpMA;ADsMA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;ACpMA;;AAEA,2CAA2C",
       "file": "VueCoemplete.vue",
-      "sourcesContent": ["<template>\n  <div\n    :style=\"border\"\n    :class=\"['vue-coemplete', { '--is-opened': isOpened }]\"\n\n    v-click-outside=\"reset\"\n\n    @keyup.esc=\"reset\"\n  >\n    <div class=\"search-wrapper\" @click=\"showItems = !showItems\">\n      <slot\n        name=\"input\"\n        :on-search=\"onSearch\"\n        :keyboard-events=\"{ up, down, select }\">\n\n        <input\n          ref=\"input\"\n          class=\"input\"\n\n          :value=\"search\"\n\n          @keydown.up.prevent=\"up\"\n          @keydown.down.prevent=\"down\"\n          @keydown.enter.tab.stop.self=\"select\"\n\n          @input=\"event => onSearch(event.target.value)\"\n        />\n      </slot>\n    </div>\n\n    <item-list\n      v-show=\"isOpened\"\n\n      :items=\"__items\"\n      :search=\"search\"\n      :pointer=\"pointer\"\n      :diacritic=\"diacritic\"\n      :search-prop=\"searchProp\"\n      :normalize-prop=\"normalizeProp\"\n<<<<<<< HEAD\n\n      @item-list:click=\"select({ key: 'Click' })\"\n      @item-list:mouseenter=\"index => pointer = index\"\n=======\n      @vue-coemplete-list:click=\"$emit('vue-coemplete-list:click')\"\n      @vue-coemplete-list=\"select({ key: 'Click' })\"\n>>>>>>> 68fa228c9904c74e21f1dddede000fa6a70a7fb0\n      @vue-coemplete-mouseenter=\"index => pointer = index\"\n    >\n      <slot slot=\"before\" name=\"before\" slot-scope=\"{ item }\" :item=\"item\" />\n      <slot slot=\"after\" name=\"after\" slot-scope=\"{ item }\" :item=\"item\" />\n    </item-list>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\n\nimport clickOutside from './clickOutside'\n\nimport bindEvent from './utils/bindEvent'\nimport setDiacritic from './utils/setDiacritic'\nimport findBy from './utils/findBy'\nimport normalizeDiacritics from './utils/normalizeDiacritics'\n\nimport ItemList from './components/ItemList.vue'\n\ninterface Item {\n  [key: string]: string\n  area: string\n  route: string\n  selector: string\n}\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  components: { ItemList },\n\n  props: {\n    value: String,\n\n    placeholder: String,\n\n    options: {\n      type: Array as () => Item[],\n      default: () => []\n    },\n\n    items: {\n      type: Array as () => Item[],\n      default: () => []\n    },\n\n    diacritic: Boolean,\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    },\n\n    normalizeProp: {\n      type: String,\n      default: 'normalized'\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      search: '' as string,\n      pointer: -1 as number,\n      showItems: false as boolean,\n      internalItems: [] as Item[],\n      internalOptions: [] as any\n    }\n  },\n\n  watch: {\n    value (value) {\n      this.search = value\n    },\n\n    options: {\n      handler () {\n        this.updateOptions()\n      },\n      immediate: true\n    }\n  },\n\n  mounted () {\n    bindEvent(document, 'visibilitychange', this.onVisibilityChange)\n  },\n\n  computed: {\n    border (): object {\n      return {\n        'border-radius': this.isOpened\n          ? '20px 20px 0 0'\n          : '20px'\n      }\n    },\n\n    hasSlots (): boolean {\n      return !!Object.keys(this.$scopedSlots).length\n    },\n\n    isOpened (): boolean {\n      return this.showItems && this.__items.length\n    },\n\n    __items (): object[] {\n      const items = this.items.length ? this.items : this.internalItems\n\n      if (!this.diacritic) return items\n\n      return setDiacritic(items, this.normalizeProp, this.searchProp)\n    }\n  },\n\n  methods: {\n    reset () {\n      this.showItems = false\n      this.pointer = -1 // reset pointer\n    },\n\n    down () {\n      if (this.pointer < this.__items.length - 1) this.pointer++\n    },\n\n    up () {\n      if (this.pointer > 0) this.pointer--\n    },\n\n    select ({ key } = 'Enter'): void {\n      if (key !== 'Enter' && key !== 'Click') return\n\n      const item = this.__items[this.pointer]\n\n      this.$nextTick(this.reset)\n\n      if (!this.hasSlots) {\n        const value = item[this.searchProp]\n\n        this.search = value\n        this.onSearch(value)\n      }\n\n      this.$emit('vue-coemplete:select', item)\n    },\n\n    updateOptions (): void {\n      this.internalOptions = setDiacritic(this.options, this.normalizeProp, this.searchProp)\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n      this.showItems = true\n\n      const query = normalizeDiacritics(this.search)\n      const key: string = this.diacritic ? this.normalizeProp : this.searchProp\n\n      const results = findBy(this.internalOptions, query, key)\n\n      this.internalItems = results\n    },\n\n    onVisibilityChange (): void {\n      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'\n\n      this.$emit(`vue-coemplete:${action}`)\n\n      if (!this.$refs.input) return\n\n      this.$refs.input.focus()\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background: white;\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
+      "sourcesContent": ["<template>\n  <div\n    :style=\"border\"\n    :class=\"['vue-coemplete', { '--is-opened': isOpened }]\"\n\n    v-click-outside=\"reset\"\n\n    @keyup.esc=\"reset\"\n  >\n    <div class=\"search-wrapper\" @click=\"showItems = !showItems\">\n      <slot\n        name=\"input\"\n        :on-search=\"onSearch\"\n        :keyboard-events=\"{ up, down, select }\">\n\n        <input\n          ref=\"input\"\n          class=\"input\"\n\n          :value=\"search\"\n\n          @keydown.up.prevent=\"up\"\n          @keydown.down.prevent=\"down\"\n          @keydown.enter.tab.stop.self=\"select\"\n\n          @input=\"event => onSearch(event.target.value)\"\n        />\n      </slot>\n    </div>\n\n    <item-list\n      v-show=\"isOpened\"\n\n      :items=\"__items\"\n      :search=\"search\"\n      :pointer=\"pointer\"\n      :diacritic=\"diacritic\"\n      :search-prop=\"searchProp\"\n      :normalize-prop=\"normalizeProp\"\n\n      @item-list:click=\"select({ key: 'Click' })\"\n      @item-list:mouseenter=\"index => pointer = index\"\n      @vue-coemplete-mouseenter=\"index => pointer = index\"\n    >\n      <slot slot=\"before\" name=\"before\" slot-scope=\"{ item }\" :item=\"item\" />\n      <slot slot=\"after\" name=\"after\" slot-scope=\"{ item }\" :item=\"item\" />\n    </item-list>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\n\nimport clickOutside from './clickOutside'\n\nimport bindEvent from './utils/bindEvent'\nimport setDiacritic from './utils/setDiacritic'\nimport findBy from './utils/findBy'\nimport normalizeDiacritics from './utils/normalizeDiacritics'\n\nimport ItemList from './components/ItemList.vue'\n\ninterface Item {\n  [key: string]: string\n  area: string\n  route: string\n  selector: string\n}\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  components: { ItemList },\n\n  props: {\n    value: String,\n\n    placeholder: String,\n\n    options: {\n      type: Array as () => Item[],\n      default: () => []\n    },\n\n    diacritic: Boolean,\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    },\n\n    normalizeProp: {\n      type: String,\n      default: 'normalized'\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      search: '' as string,\n      pointer: -1 as number,\n      showItems: false as boolean\n    }\n  },\n\n  watch: {\n    value (value) {\n      this.search = value\n    }\n  },\n\n  mounted () {\n    bindEvent(document, 'visibilitychange', this.onVisibilityChange)\n  },\n\n  computed: {\n    border (): object {\n      return {\n        'border-radius': this.isOpened\n          ? '20px 20px 0 0'\n          : '20px'\n      }\n    },\n\n    hasSlots (): boolean {\n      return !!Object.keys(this.$scopedSlots).length\n    },\n\n    isOpened (): boolean {\n      return this.showItems && this.__items.length\n    },\n\n    __items (): object[] {\n      if (!this.search) return this.options\n\n      const query: string = normalizeDiacritics(this.search)\n      const key: string = this.diacritic ? this.normalizeProp : this.searchProp\n      const diacritic = setDiacritic(this.options, this.normalizeProp, this.searchProp)\n\n      return inclusiveSearch(diacritic, query, key)\n    }\n  },\n\n  methods: {\n    reset () {\n      this.showItems = false\n      this.pointer = -1 // reset pointer\n    },\n\n    down () {\n      if (this.pointer < this.__items.length - 1) this.pointer++\n    },\n\n    up () {\n      if (this.pointer > 0) this.pointer--\n    },\n\n    select ({ key } = 'Enter'): void {\n      if (key !== 'Enter' && key !== 'Click') return\n\n      const item = this.__items[this.pointer]\n\n      this.$nextTick(this.reset)\n\n      if (!this.hasSlots) {\n        const value = item[this.searchProp]\n\n        this.search = value\n        this.onSearch(value)\n      }\n\n      this.$emit('vue-coemplete:select', item)\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n      this.showItems = true\n    },\n\n    onVisibilityChange (): void {\n      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'\n\n      this.$emit(`vue-coemplete:${action}`)\n\n      if (!this.$refs.input) return\n\n      this.$refs.input.focus()\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background: white;\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
     },
     media: undefined
   });
+};
 /* scoped */
 
 
@@ -849,7 +854,7 @@ var component = Object(_node_modules_poi_node_modules_vue_loader_lib_runtime_com
   null,
   null,
   null
-
+  
 )
 
 /* hot reload */
@@ -869,7 +874,7 @@ component.options.__file = "examples/Index.vue"
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../node_modules/poi/lib/webpack/babel-loader.js??ref--1-0!../node_modules/cache-loader/dist/cjs.js??ref--2-0!../node_modules/poi/node_modules/vue-loader/lib??vue-loader-options!./Index.vue?vue&type=script&lang=js& */ "./node_modules/poi/lib/webpack/babel-loader.js?!./node_modules/cache-loader/dist/cjs.js?!./node_modules/poi/node_modules/vue-loader/lib/index.js?!./examples/Index.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]);
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
@@ -885,7 +890,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../node_modules/vue-style-loader??ref--5-oneOf-1-0!../node_modules/poi/node_modules/css-loader/dist/cjs.js??ref--5-oneOf-1-1!../node_modules/poi/node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/sass-loader/dist/cjs.js??ref--5-oneOf-1-2!../node_modules/cache-loader/dist/cjs.js??ref--2-0!../node_modules/poi/node_modules/vue-loader/lib??vue-loader-options!./Index.vue?vue&type=style&index=0&lang=scss& */ "./node_modules/vue-style-loader/index.js?!./node_modules/poi/node_modules/css-loader/dist/cjs.js?!./node_modules/poi/node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js?!./node_modules/cache-loader/dist/cjs.js?!./node_modules/poi/node_modules/vue-loader/lib/index.js?!./examples/Index.vue?vue&type=style&index=0&lang=scss&");
 /* harmony import */ var _node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
- /* harmony default export */ __webpack_exports__["default"] = (_node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default.a);
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default.a); 
 
 /***/ }),
 
@@ -936,7 +941,7 @@ var component = Object(_node_modules_poi_node_modules_vue_loader_lib_runtime_com
   null,
   null,
   null
-
+  
 )
 
 /* hot reload */
@@ -956,7 +961,7 @@ component.options.__file = "examples/WithSlots.vue"
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../node_modules/poi/lib/webpack/babel-loader.js??ref--1-0!../node_modules/cache-loader/dist/cjs.js??ref--2-0!../node_modules/poi/node_modules/vue-loader/lib??vue-loader-options!./WithSlots.vue?vue&type=script&lang=js& */ "./node_modules/poi/lib/webpack/babel-loader.js?!./node_modules/cache-loader/dist/cjs.js?!./node_modules/poi/node_modules/vue-loader/lib/index.js?!./examples/WithSlots.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]);
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
@@ -972,7 +977,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../node_modules/vue-style-loader??ref--5-oneOf-1-0!../node_modules/poi/node_modules/css-loader/dist/cjs.js??ref--5-oneOf-1-1!../node_modules/poi/node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/sass-loader/dist/cjs.js??ref--5-oneOf-1-2!../node_modules/cache-loader/dist/cjs.js??ref--2-0!../node_modules/poi/node_modules/vue-loader/lib??vue-loader-options!./WithSlots.vue?vue&type=style&index=0&lang=scss& */ "./node_modules/vue-style-loader/index.js?!./node_modules/poi/node_modules/css-loader/dist/cjs.js?!./node_modules/poi/node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js?!./node_modules/cache-loader/dist/cjs.js?!./node_modules/poi/node_modules/vue-loader/lib/index.js?!./examples/WithSlots.vue?vue&type=style&index=0&lang=scss&");
 /* harmony import */ var _node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__);
 /* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
- /* harmony default export */ __webpack_exports__["default"] = (_node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default.a);
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_vue_style_loader_index_js_ref_5_oneOf_1_0_node_modules_poi_node_modules_css_loader_dist_cjs_js_ref_5_oneOf_1_1_node_modules_poi_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_sass_loader_dist_cjs_js_ref_5_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithSlots_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default.a); 
 
 /***/ }),
 
@@ -1021,7 +1026,7 @@ var component = Object(_node_modules_poi_node_modules_vue_loader_lib_runtime_com
   null,
   null,
   null
-
+  
 )
 
 /* hot reload */
@@ -1041,7 +1046,7 @@ component.options.__file = "examples/WithoutSlots.vue"
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithoutSlots_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../node_modules/poi/lib/webpack/babel-loader.js??ref--1-0!../node_modules/cache-loader/dist/cjs.js??ref--2-0!../node_modules/poi/node_modules/vue-loader/lib??vue-loader-options!./WithoutSlots.vue?vue&type=script&lang=js& */ "./node_modules/poi/lib/webpack/babel-loader.js?!./node_modules/cache-loader/dist/cjs.js?!./node_modules/poi/node_modules/vue-loader/lib/index.js?!./examples/WithoutSlots.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithoutSlots_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]);
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_poi_lib_webpack_babel_loader_js_ref_1_0_node_modules_cache_loader_dist_cjs_js_ref_2_0_node_modules_poi_node_modules_vue_loader_lib_index_js_vue_loader_options_WithoutSlots_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
