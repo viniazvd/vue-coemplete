@@ -53,9 +53,9 @@ import Vue from 'vue'
 
 import clickOutside from './clickOutside'
 
+import findBy from './utils/findBy'
 import bindEvent from './utils/bindEvent'
 import setDiacritic from './utils/setDiacritic'
-import findBy from './utils/findBy'
 import normalizeDiacritics from './utils/normalizeDiacritics'
 
 import ItemList from './components/ItemList.vue'
@@ -139,7 +139,7 @@ export default Vue.extend({
       const key: string = this.diacritic ? this.normalizeProp : this.searchProp
       const diacritic = setDiacritic(this.options, this.normalizeProp, this.searchProp)
 
-      return inclusiveSearch(diacritic, query, key)
+      return findBy(diacritic, query, key)
     }
   },
 
