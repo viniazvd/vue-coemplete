@@ -82,11 +82,6 @@ export default Vue.extend({
       default: () => []
     },
 
-    items: {
-      type: Array as () => Item[],
-      default: () => []
-    },
-
     diacritic: Boolean,
 
     searchProp: {
@@ -106,22 +101,13 @@ export default Vue.extend({
     return {
       search: '' as string,
       pointer: -1 as number,
-      showItems: false as boolean,
-      internalItems: [] as Item[],
-      internalOptions: [] as any
+      showItems: false as boolean
     }
   },
 
   watch: {
     value (value) {
       this.search = value
-    },
-
-    options: {
-      handler () {
-        this.updateOptions()
-      },
-      immediate: true
     }
   },
 
@@ -147,11 +133,13 @@ export default Vue.extend({
     },
 
     __items (): object[] {
-      const items = this.items.length ? this.items : this.internalItems
+      if (!this.search) return this.options
 
-      if (!this.diacritic) return items
+      const query: string = normalizeDiacritics(this.search)
+      const key: string = this.diacritic ? this.normalizeProp : this.searchProp
+      const diacritic = setDiacritic(this.options, this.normalizeProp, this.searchProp)
 
-      return setDiacritic(items, this.normalizeProp, this.searchProp)
+      return inclusiveSearch(diacritic, query, key)
     }
   },
 
@@ -186,20 +174,9 @@ export default Vue.extend({
       this.$emit('vue-coemplete:select', item)
     },
 
-    updateOptions (): void {
-      this.internalOptions = setDiacritic(this.options, this.normalizeProp, this.searchProp)
-    },
-
     onSearch (value: string): void {
       this.search = value
       this.showItems = true
-
-      const query = normalizeDiacritics(this.search)
-      const key: string = this.diacritic ? this.normalizeProp : this.searchProp
-
-      const results = findBy(this.internalOptions, query, key)
-
-      this.internalItems = results
     },
 
     onVisibilityChange (): void {
