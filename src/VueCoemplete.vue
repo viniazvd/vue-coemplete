@@ -34,7 +34,6 @@
       :items="__items"
       :search="search"
       :pointer="pointer"
-      :diacritic="diacritic"
       :search-prop="searchProp"
       :normalize-prop="normalizeProp"
 
@@ -60,13 +59,6 @@ import normalizeDiacritics from './utils/normalizeDiacritics'
 
 import ItemList from './components/ItemList.vue'
 
-interface Item {
-  [key: string]: string
-  area: string
-  route: string
-  selector: string
-}
-
 export default Vue.extend({
   name: 'vue-coemplete',
 
@@ -78,11 +70,9 @@ export default Vue.extend({
     placeholder: String,
 
     options: {
-      type: Array as () => Item[],
+      type: Array,
       default: () => []
     },
-
-    diacritic: Boolean,
 
     searchProp: {
       type: String,
@@ -136,10 +126,9 @@ export default Vue.extend({
       if (!this.search) return this.options
 
       const query: string = normalizeDiacritics(this.search)
-      const key: string = this.diacritic ? this.normalizeProp : this.searchProp
-      const diacritic = setDiacritic(this.options, this.normalizeProp, this.searchProp)
+      const xs: object[] = setDiacritic(this.options, this.normalizeProp, this.searchProp)
 
-      return findBy(diacritic, query, key)
+      return findBy(xs, query, this.normalizeProp)
     }
   },
 

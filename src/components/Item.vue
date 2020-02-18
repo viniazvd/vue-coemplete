@@ -16,8 +16,6 @@ export default Vue.extend({
   name: 'item',
 
   props: {
-    diacritic: Boolean,
-
     searchProp: String,
 
     normalizeProp: String,
@@ -41,9 +39,7 @@ export default Vue.extend({
         // reset data
         el.innerHTML = ''
 
-        const typed = !this.diacritic
-          ? this.search
-          : getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp])
+        const typed = getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp])
 
         this.item[this.searchProp]
           .split(typed)
