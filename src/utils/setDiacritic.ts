@@ -1,7 +1,7 @@
 import normalizeDiacritics from './normalizeDiacritics'
 
-function setDiacritic (items: object[], normalizeProp: string, searchProp: string): object[] {
-  return items.map((item: object) => ({
+function setDiacritic (xs: object[], normalizeProp: string, searchProp: string): object[] {
+  return xs.map((item: object) => ({
     ...item,
     [normalizeProp]: normalizeDiacritics(item[searchProp])
   }))
