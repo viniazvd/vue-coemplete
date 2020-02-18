@@ -1,7 +1,7 @@
 <template>
   <div
     :style="border"
-    :class="['vue-coemplete', { '--is-opened': isOpened }]"
+    :class="['vue-coemplete', { '--is-opened': isOpened && !__items.length }]"
 
     v-click-outside="reset"
 
