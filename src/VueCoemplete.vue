@@ -1,7 +1,7 @@
 <template>
   <div
-    :style="border"
-    :class="['vue-coemplete', { '--is-opened': isOpened && !__items.length }]"
+    :style="styles"
+    :class="classes"
 
     v-click-outside="reset"
 
@@ -86,7 +86,7 @@ export default Vue.extend({
 
     minToSearch: {
       type: Number,
-      default: 3
+      default: 2
     }
   },
 
@@ -111,16 +111,29 @@ export default Vue.extend({
   },
 
   computed: {
-    border (): object {
-      return {
+    styles (): object {
+      const border = {
         'border-radius': this.isOpened
           ? '20px 20px 0 0'
           : '20px'
       }
+
+      return { ...border }
+    },
+
+    classes () {
+      return ['vue-coemplete', {
+        '--is-opened': this.isOpened,
+        '--has-shadow': this.hasShadow
+      }]
     },
 
     hasSlots (): boolean {
       return !!Object.keys(this.$scopedSlots).length
+    },
+
+    hasShadow () {
+      return this.showItems && !this.__items.length
     },
 
     isOpened (): boolean {
