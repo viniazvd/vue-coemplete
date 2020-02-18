@@ -105,6 +105,35 @@ function _interopDefault(ex) {
 }
 
 var Vue = _interopDefault(__webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.runtime.esm.js"));
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
+
+
+var __assign = function () {
+  __assign = Object.assign || function __assign(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+      s = arguments[i];
+
+      for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+    }
+
+    return t;
+  };
+
+  return __assign.apply(this, arguments);
+};
 
 var clickOutside = {
   bind(el, binding) {
@@ -158,35 +187,6 @@ function bindEvent(el, event, callback, ...options) {
   el.addEventListener(event, callback, ...options);
   return () => el.removeEventListener(event, callback, ...options);
 }
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
-***************************************************************************** */
-
-
-var __assign = function () {
-  __assign = Object.assign || function __assign(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-      s = arguments[i];
-
-      for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-    }
-
-    return t;
-  };
-
-  return __assign.apply(this, arguments);
-};
 
 function normalizeDiacritics(value) {
   if (!value) return '';
@@ -604,7 +604,7 @@ var script$2 = Vue.extend({
     },
     minToSearch: {
       type: Number,
-      default: 3
+      default: 2
     }
   },
   directives: {
@@ -626,13 +626,23 @@ var script$2 = Vue.extend({
     bindEvent(document, 'visibilitychange', this.onVisibilityChange);
   },
   computed: {
-    border: function () {
-      return {
+    styles: function () {
+      var border = {
         'border-radius': this.isOpened ? '20px 20px 0 0' : '20px'
       };
+      return __assign({}, border);
+    },
+    classes: function () {
+      return ['vue-coemplete', {
+        '--is-opened': this.isOpened,
+        '--has-shadow': this.hasShadow
+      }];
     },
     hasSlots: function () {
       return !!Object.keys(this.$scopedSlots).length;
+    },
+    hasShadow: function () {
+      return this.showItems && !this.__items.length;
     },
     isOpened: function () {
       return this.showItems && this.__items.length;
@@ -700,10 +710,8 @@ var __vue_render__$2 = function () {
       value: _vm.reset,
       expression: "reset"
     }],
-    class: ["vue-coemplete", {
-      "--is-opened": _vm.isOpened && !_vm.__items.length
-    }],
-    style: _vm.border,
+    class: _vm.classes,
+    style: _vm.styles,
     on: {
       keyup: function ($event) {
         if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "esc", 27, $event.key, ["Esc", "Escape"])) {
@@ -818,15 +826,15 @@ __vue_render__$2._withStripped = true;
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-13185fa6_0", {
+  inject("data-v-8e0a8290_0", {
     source: ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */",
     map: {
       "version": 3,
       "sources": ["/Users/convenia/Desktop/convenia-spa/vue-coemplete/src/VueCoemplete.vue", "VueCoemplete.vue"],
       "names": [],
-      "mappings": "AA6LA;EACA,aAAA;EACA,sBAAA;EAEA,kBAAA;EAEA,iBAAA;AC9LA;ADgMA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;AC9LA;ADgMA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;AC9LA;;AAEA,2CAA2C",
+      "mappings": "AA0MA;EACA,aAAA;EACA,sBAAA;EAEA,kBAAA;EAEA,iBAAA;AC3MA;AD6MA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;AC3MA;AD6MA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;AC3MA;;AAEA,2CAA2C",
       "file": "VueCoemplete.vue",
-      "sourcesContent": ["<template>\n  <div\n    :style=\"border\"\n    :class=\"['vue-coemplete', { '--is-opened': isOpened && !__items.length }]\"\n\n    v-click-outside=\"reset\"\n\n    @keyup.esc=\"reset\"\n  >\n    <div class=\"search-wrapper\" @click=\"showItems = !showItems\">\n      <slot\n        name=\"input\"\n        :on-search=\"onSearch\"\n        :keyboard-events=\"{ up, down, select }\">\n\n        <input\n          ref=\"input\"\n          class=\"input\"\n\n          :value=\"search\"\n\n          @keydown.up.prevent=\"up\"\n          @keydown.down.prevent=\"down\"\n          @keydown.enter.tab.stop.self=\"select\"\n\n          @input=\"event => onSearch(event.target.value)\"\n        />\n      </slot>\n    </div>\n\n    <item-list\n      v-show=\"isOpened\"\n\n      :items=\"__items\"\n      :search=\"search\"\n      :pointer=\"pointer\"\n      :search-prop=\"searchProp\"\n      :normalize-prop=\"normalizeProp\"\n\n      @item-list:click=\"select({ key: 'Click' })\"\n      @item-list:mouseenter=\"index => pointer = index\"\n      @vue-coemplete-mouseenter=\"index => pointer = index\"\n    >\n      <slot slot=\"before\" name=\"before\" slot-scope=\"{ item }\" :item=\"item\" />\n      <slot slot=\"after\" name=\"after\" slot-scope=\"{ item }\" :item=\"item\" />\n    </item-list>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\n\nimport clickOutside from './clickOutside'\n\nimport findBy from './utils/findBy'\nimport bindEvent from './utils/bindEvent'\nimport setDiacritic from './utils/setDiacritic'\nimport normalizeDiacritics from './utils/normalizeDiacritics'\n\nimport ItemList from './components/ItemList.vue'\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  components: { ItemList },\n\n  props: {\n    value: String,\n\n    placeholder: String,\n\n    options: {\n      type: Array,\n      default: () => []\n    },\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    },\n\n    normalizeProp: {\n      type: String,\n      default: 'normalized'\n    },\n\n    minToSearch: {\n      type: Number,\n      default: 3\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      search: '' as string,\n      pointer: -1 as number,\n      showItems: false as boolean\n    }\n  },\n\n  watch: {\n    value (value) {\n      this.search = value\n    }\n  },\n\n  mounted () {\n    bindEvent(document, 'visibilitychange', this.onVisibilityChange)\n  },\n\n  computed: {\n    border (): object {\n      return {\n        'border-radius': this.isOpened\n          ? '20px 20px 0 0'\n          : '20px'\n      }\n    },\n\n    hasSlots (): boolean {\n      return !!Object.keys(this.$scopedSlots).length\n    },\n\n    isOpened (): boolean {\n      return this.showItems && this.__items.length\n    },\n\n    __items (): object[] {\n      if (!this.search || this.search.length <= this.minToSearch) return []\n\n      const query: string = normalizeDiacritics(this.search)\n      const xs: object[] = setDiacritic(this.options, this.normalizeProp, this.searchProp)\n\n      return findBy(xs, query, this.normalizeProp)\n    }\n  },\n\n  methods: {\n    reset () {\n      this.showItems = false\n      this.pointer = -1 // reset pointer\n    },\n\n    down () {\n      if (this.pointer < this.__items.length - 1) this.pointer++\n    },\n\n    up () {\n      if (this.pointer > 0) this.pointer--\n    },\n\n    select ({ key } = 'Enter'): void {\n      if (key !== 'Enter' && key !== 'Click') return\n\n      const item = this.__items[this.pointer]\n\n      this.$nextTick(this.reset)\n\n      if (!this.hasSlots) {\n        const value = item[this.searchProp]\n\n        this.search = value\n        this.onSearch(value)\n      }\n\n      this.$emit('vue-coemplete:select', item)\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n      this.showItems = true\n    },\n\n    onVisibilityChange (): void {\n      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'\n\n      this.$emit(`vue-coemplete:${action}`)\n\n      if (!this.$refs.input) return\n\n      this.$refs.input.focus()\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background: white;\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
+      "sourcesContent": ["<template>\n  <div\n    :style=\"styles\"\n    :class=\"classes\"\n\n    v-click-outside=\"reset\"\n\n    @keyup.esc=\"reset\"\n  >\n    <div class=\"search-wrapper\" @click=\"showItems = !showItems\">\n      <slot\n        name=\"input\"\n        :on-search=\"onSearch\"\n        :keyboard-events=\"{ up, down, select }\">\n\n        <input\n          ref=\"input\"\n          class=\"input\"\n\n          :value=\"search\"\n\n          @keydown.up.prevent=\"up\"\n          @keydown.down.prevent=\"down\"\n          @keydown.enter.tab.stop.self=\"select\"\n\n          @input=\"event => onSearch(event.target.value)\"\n        />\n      </slot>\n    </div>\n\n    <item-list\n      v-show=\"isOpened\"\n\n      :items=\"__items\"\n      :search=\"search\"\n      :pointer=\"pointer\"\n      :search-prop=\"searchProp\"\n      :normalize-prop=\"normalizeProp\"\n\n      @item-list:click=\"select({ key: 'Click' })\"\n      @item-list:mouseenter=\"index => pointer = index\"\n      @vue-coemplete-mouseenter=\"index => pointer = index\"\n    >\n      <slot slot=\"before\" name=\"before\" slot-scope=\"{ item }\" :item=\"item\" />\n      <slot slot=\"after\" name=\"after\" slot-scope=\"{ item }\" :item=\"item\" />\n    </item-list>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\n\nimport clickOutside from './clickOutside'\n\nimport findBy from './utils/findBy'\nimport bindEvent from './utils/bindEvent'\nimport setDiacritic from './utils/setDiacritic'\nimport normalizeDiacritics from './utils/normalizeDiacritics'\n\nimport ItemList from './components/ItemList.vue'\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  components: { ItemList },\n\n  props: {\n    value: String,\n\n    placeholder: String,\n\n    options: {\n      type: Array,\n      default: () => []\n    },\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    },\n\n    normalizeProp: {\n      type: String,\n      default: 'normalized'\n    },\n\n    minToSearch: {\n      type: Number,\n      default: 2\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      search: '' as string,\n      pointer: -1 as number,\n      showItems: false as boolean\n    }\n  },\n\n  watch: {\n    value (value) {\n      this.search = value\n    }\n  },\n\n  mounted () {\n    bindEvent(document, 'visibilitychange', this.onVisibilityChange)\n  },\n\n  computed: {\n    styles (): object {\n      const border = {\n        'border-radius': this.isOpened\n          ? '20px 20px 0 0'\n          : '20px'\n      }\n\n      return { ...border }\n    },\n\n    classes () {\n      return ['vue-coemplete', {\n        '--is-opened': this.isOpened,\n        '--has-shadow': this.hasShadow\n      }]\n    },\n\n    hasSlots (): boolean {\n      return !!Object.keys(this.$scopedSlots).length\n    },\n\n    hasShadow () {\n      return this.showItems && !this.__items.length\n    },\n\n    isOpened (): boolean {\n      return this.showItems && this.__items.length\n    },\n\n    __items (): object[] {\n      if (!this.search || this.search.length <= this.minToSearch) return []\n\n      const query: string = normalizeDiacritics(this.search)\n      const xs: object[] = setDiacritic(this.options, this.normalizeProp, this.searchProp)\n\n      return findBy(xs, query, this.normalizeProp)\n    }\n  },\n\n  methods: {\n    reset () {\n      this.showItems = false\n      this.pointer = -1 // reset pointer\n    },\n\n    down () {\n      if (this.pointer < this.__items.length - 1) this.pointer++\n    },\n\n    up () {\n      if (this.pointer > 0) this.pointer--\n    },\n\n    select ({ key } = 'Enter'): void {\n      if (key !== 'Enter' && key !== 'Click') return\n\n      const item = this.__items[this.pointer]\n\n      this.$nextTick(this.reset)\n\n      if (!this.hasSlots) {\n        const value = item[this.searchProp]\n\n        this.search = value\n        this.onSearch(value)\n      }\n\n      this.$emit('vue-coemplete:select', item)\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n      this.showItems = true\n    },\n\n    onVisibilityChange (): void {\n      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'\n\n      this.$emit(`vue-coemplete:${action}`)\n\n      if (!this.$refs.input) return\n\n      this.$refs.input.focus()\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background: white;\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
     },
     media: undefined
   });
