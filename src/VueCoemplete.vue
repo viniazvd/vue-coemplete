@@ -82,6 +82,11 @@ export default Vue.extend({
     normalizeProp: {
       type: String,
       default: 'normalized'
+    },
+
+    minToSearch: {
+      type: Number,
+      default: 3
     }
   },
 
@@ -123,7 +128,7 @@ export default Vue.extend({
     },
 
     __items (): object[] {
-      if (!this.search) return this.options
+      if (!this.search || this.search.length <= this.minToSearch) return []
 
       const query: string = normalizeDiacritics(this.search)
       const xs: object[] = setDiacritic(this.options, this.normalizeProp, this.searchProp)
