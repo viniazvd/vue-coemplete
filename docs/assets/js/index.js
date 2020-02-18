@@ -125,7 +125,13 @@ var clickOutside = {
 
 };
 
+var normalizeString = function (value) {
+  if (!value) return '';
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+};
+
 function getWords(query) {
+  if (!query) return '';
   return query.trim().split(' ');
 }
 
@@ -144,7 +150,7 @@ function findBy(xs, query, key) {
 
   var words = getWords(query);
   return xs.filter(function (option) {
-    return option[key].includes(query);
+    return normalizeString(option[key]).includes(query);
   });
 }
 
@@ -187,8 +193,8 @@ function normalizeDiacritics(value) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-function setDiacritic(items, normalizeProp, searchProp) {
-  return items.map(function (item) {
+function setDiacritic(xs, normalizeProp, searchProp) {
+  return xs.map(function (item) {
     var _a;
 
     return __assign(__assign({}, item), (_a = {}, _a[normalizeProp] = normalizeDiacritics(item[searchProp]), _a));
@@ -232,7 +238,6 @@ function getDiacritic(obj, key, word, words) {
 var script = Vue.extend({
   name: 'item',
   props: {
-    diacritic: Boolean,
     searchProp: String,
     normalizeProp: String,
     item: {
@@ -251,7 +256,7 @@ var script = Vue.extend({
         var el = _this.$refs[_this.index]; // reset data
 
         el.innerHTML = '';
-        var typed = !_this.diacritic ? _this.search : getDiacritic(_this.item, _this.searchProp, normalizeDiacritics(_this.search), _this.item[_this.normalizeProp]);
+        var typed = getDiacritic(_this.item, _this.searchProp, normalizeDiacritics(_this.search), _this.item[_this.normalizeProp]);
 
         _this.item[_this.searchProp].split(typed).forEach(function (chunk, i, array) {
           var hasAfter = !!array[i + 1];
@@ -434,7 +439,7 @@ __vue_render__._withStripped = true;
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-3e7d3c75_0", {
+  inject("data-v-d679641e_0", {
     source: "\n\n/*# sourceMappingURL=Item.vue.map */",
     map: {
       "version": 3,
@@ -543,11 +548,11 @@ __vue_render__$1._withStripped = true;
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-79579053_0", {
+  inject("data-v-99cc7e16_0", {
     source: ".list-wrapper {\n  display: flex;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px);\n}\n.list-wrapper > .list {\n  width: 100%;\n  font-size: 14px;\n  overflow-y: auto;\n}\n.list-wrapper > .list > .item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  box-sizing: border-box;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.list-wrapper > .list > .item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=ItemList.vue.map */",
     map: {
       "version": 3,
-      "sources": ["/home/viniazvd/Área de Trabalho/convenia-spa/vue-coemplete/src/components/ItemList.vue", "ItemList.vue"],
+      "sources": ["/Users/convenia/Desktop/convenia-spa/vue-coemplete/src/components/ItemList.vue", "ItemList.vue"],
       "names": [],
       "mappings": "AAwCA;EACA,aAAA;EAEA,kBAAA;EACA,OAAA;EACA,SAAA;EAEA,WAAA;EACA,WAAA;EACA,iBAAA;EACA,0BAAA;EACA,6CAAA;EACA,8BAAA;ACzCA;AD2CA;EACA,WAAA;EACA,eAAA;EACA,gBAAA;ACzCA;AD2CA;EACA,YAAA;EACA,cAAA;EACA,eAAA;EACA,eAAA;EACA,iBAAA;EACA,sBAAA;EAEA,eAAA;EAEA,kBAAA;EACA,mBAAA;EACA,uBAAA;AC3CA;AD6CA;EAAA,wCAAA;AC1CA;;AAEA,uCAAuC",
       "file": "ItemList.vue",
@@ -589,7 +594,6 @@ var script$2 = Vue.extend({
         return [];
       }
     },
-    diacritic: Boolean,
     searchProp: {
       type: String,
       default: 'key'
@@ -632,9 +636,8 @@ var script$2 = Vue.extend({
     __items: function () {
       if (!this.search) return this.options;
       var query = normalizeDiacritics(this.search);
-      var key = this.diacritic ? this.normalizeProp : this.searchProp;
-      var diacritic = setDiacritic(this.options, this.normalizeProp, this.searchProp);
-      return findBy(diacritic, query, key);
+      var xs = setDiacritic(this.options, this.normalizeProp, this.searchProp);
+      return findBy(xs, query, this.normalizeProp);
     }
   },
   methods: {
@@ -769,7 +772,6 @@ var __vue_render__$2 = function () {
       items: _vm.__items,
       search: _vm.search,
       pointer: _vm.pointer,
-      diacritic: _vm.diacritic,
       "search-prop": _vm.searchProp,
       "normalize-prop": _vm.normalizeProp
     },
@@ -812,15 +814,15 @@ __vue_render__$2._withStripped = true;
 
 const __vue_inject_styles__$2 = function (inject) {
   if (!inject) return;
-  inject("data-v-70d0f38d_0", {
+  inject("data-v-4c26ab5e_0", {
     source: ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */",
     map: {
       "version": 3,
-      "sources": ["/home/viniazvd/Área de Trabalho/convenia-spa/vue-coemplete/src/VueCoemplete.vue", "VueCoemplete.vue"],
+      "sources": ["/Users/convenia/Desktop/convenia-spa/vue-coemplete/src/VueCoemplete.vue", "VueCoemplete.vue"],
       "names": [],
-      "mappings": "AAmMA;EACA,aAAA;EACA,sBAAA;EAEA,kBAAA;EAEA,iBAAA;ACpMA;ADsMA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;ACpMA;ADsMA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;ACpMA;;AAEA,2CAA2C",
+      "mappings": "AAwLA;EACA,aAAA;EACA,sBAAA;EAEA,kBAAA;EAEA,iBAAA;ACzLA;AD2LA;EACA,aAAA;EACA,gBAAA;EACA,kBAAA;ACzLA;AD2LA;EACA,OAAA;EACA,UAAA;EACA,WAAA;EACA,YAAA;EACA,YAAA;EACA,eAAA;EACA,kBAAA;EACA,mBAAA;EACA,mBAAA;EACA,4BAAA;EACA,kCAAA;ACzLA;;AAEA,2CAA2C",
       "file": "VueCoemplete.vue",
-      "sourcesContent": ["<template>\n  <div\n    :style=\"border\"\n    :class=\"['vue-coemplete', { '--is-opened': isOpened }]\"\n\n    v-click-outside=\"reset\"\n\n    @keyup.esc=\"reset\"\n  >\n    <div class=\"search-wrapper\" @click=\"showItems = !showItems\">\n      <slot\n        name=\"input\"\n        :on-search=\"onSearch\"\n        :keyboard-events=\"{ up, down, select }\">\n\n        <input\n          ref=\"input\"\n          class=\"input\"\n\n          :value=\"search\"\n\n          @keydown.up.prevent=\"up\"\n          @keydown.down.prevent=\"down\"\n          @keydown.enter.tab.stop.self=\"select\"\n\n          @input=\"event => onSearch(event.target.value)\"\n        />\n      </slot>\n    </div>\n\n    <item-list\n      v-show=\"isOpened\"\n\n      :items=\"__items\"\n      :search=\"search\"\n      :pointer=\"pointer\"\n      :diacritic=\"diacritic\"\n      :search-prop=\"searchProp\"\n      :normalize-prop=\"normalizeProp\"\n\n      @item-list:click=\"select({ key: 'Click' })\"\n      @item-list:mouseenter=\"index => pointer = index\"\n      @vue-coemplete-mouseenter=\"index => pointer = index\"\n    >\n      <slot slot=\"before\" name=\"before\" slot-scope=\"{ item }\" :item=\"item\" />\n      <slot slot=\"after\" name=\"after\" slot-scope=\"{ item }\" :item=\"item\" />\n    </item-list>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\n\nimport clickOutside from './clickOutside'\n\nimport findBy from './utils/findBy'\nimport bindEvent from './utils/bindEvent'\nimport setDiacritic from './utils/setDiacritic'\nimport normalizeDiacritics from './utils/normalizeDiacritics'\n\nimport ItemList from './components/ItemList.vue'\n\ninterface Item {\n  [key: string]: string\n  area: string\n  route: string\n  selector: string\n}\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  components: { ItemList },\n\n  props: {\n    value: String,\n\n    placeholder: String,\n\n    options: {\n      type: Array as () => Item[],\n      default: () => []\n    },\n\n    diacritic: Boolean,\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    },\n\n    normalizeProp: {\n      type: String,\n      default: 'normalized'\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      search: '' as string,\n      pointer: -1 as number,\n      showItems: false as boolean\n    }\n  },\n\n  watch: {\n    value (value) {\n      this.search = value\n    }\n  },\n\n  mounted () {\n    bindEvent(document, 'visibilitychange', this.onVisibilityChange)\n  },\n\n  computed: {\n    border (): object {\n      return {\n        'border-radius': this.isOpened\n          ? '20px 20px 0 0'\n          : '20px'\n      }\n    },\n\n    hasSlots (): boolean {\n      return !!Object.keys(this.$scopedSlots).length\n    },\n\n    isOpened (): boolean {\n      return this.showItems && this.__items.length\n    },\n\n    __items (): object[] {\n      if (!this.search) return this.options\n\n      const query: string = normalizeDiacritics(this.search)\n      const key: string = this.diacritic ? this.normalizeProp : this.searchProp\n      const diacritic = setDiacritic(this.options, this.normalizeProp, this.searchProp)\n\n      return findBy(diacritic, query, key)\n    }\n  },\n\n  methods: {\n    reset () {\n      this.showItems = false\n      this.pointer = -1 // reset pointer\n    },\n\n    down () {\n      if (this.pointer < this.__items.length - 1) this.pointer++\n    },\n\n    up () {\n      if (this.pointer > 0) this.pointer--\n    },\n\n    select ({ key } = 'Enter'): void {\n      if (key !== 'Enter' && key !== 'Click') return\n\n      const item = this.__items[this.pointer]\n\n      this.$nextTick(this.reset)\n\n      if (!this.hasSlots) {\n        const value = item[this.searchProp]\n\n        this.search = value\n        this.onSearch(value)\n      }\n\n      this.$emit('vue-coemplete:select', item)\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n      this.showItems = true\n    },\n\n    onVisibilityChange (): void {\n      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'\n\n      this.$emit(`vue-coemplete:${action}`)\n\n      if (!this.$refs.input) return\n\n      this.$refs.input.focus()\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background: white;\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
+      "sourcesContent": ["<template>\n  <div\n    :style=\"border\"\n    :class=\"['vue-coemplete', { '--is-opened': isOpened }]\"\n\n    v-click-outside=\"reset\"\n\n    @keyup.esc=\"reset\"\n  >\n    <div class=\"search-wrapper\" @click=\"showItems = !showItems\">\n      <slot\n        name=\"input\"\n        :on-search=\"onSearch\"\n        :keyboard-events=\"{ up, down, select }\">\n\n        <input\n          ref=\"input\"\n          class=\"input\"\n\n          :value=\"search\"\n\n          @keydown.up.prevent=\"up\"\n          @keydown.down.prevent=\"down\"\n          @keydown.enter.tab.stop.self=\"select\"\n\n          @input=\"event => onSearch(event.target.value)\"\n        />\n      </slot>\n    </div>\n\n    <item-list\n      v-show=\"isOpened\"\n\n      :items=\"__items\"\n      :search=\"search\"\n      :pointer=\"pointer\"\n      :search-prop=\"searchProp\"\n      :normalize-prop=\"normalizeProp\"\n\n      @item-list:click=\"select({ key: 'Click' })\"\n      @item-list:mouseenter=\"index => pointer = index\"\n      @vue-coemplete-mouseenter=\"index => pointer = index\"\n    >\n      <slot slot=\"before\" name=\"before\" slot-scope=\"{ item }\" :item=\"item\" />\n      <slot slot=\"after\" name=\"after\" slot-scope=\"{ item }\" :item=\"item\" />\n    </item-list>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\n\nimport clickOutside from './clickOutside'\n\nimport findBy from './utils/findBy'\nimport bindEvent from './utils/bindEvent'\nimport setDiacritic from './utils/setDiacritic'\nimport normalizeDiacritics from './utils/normalizeDiacritics'\n\nimport ItemList from './components/ItemList.vue'\n\nexport default Vue.extend({\n  name: 'vue-coemplete',\n\n  components: { ItemList },\n\n  props: {\n    value: String,\n\n    placeholder: String,\n\n    options: {\n      type: Array,\n      default: () => []\n    },\n\n    searchProp: {\n      type: String,\n      default: 'key'\n    },\n\n    normalizeProp: {\n      type: String,\n      default: 'normalized'\n    }\n  },\n\n  directives: { clickOutside },\n\n  data () {\n    return {\n      search: '' as string,\n      pointer: -1 as number,\n      showItems: false as boolean\n    }\n  },\n\n  watch: {\n    value (value) {\n      this.search = value\n    }\n  },\n\n  mounted () {\n    bindEvent(document, 'visibilitychange', this.onVisibilityChange)\n  },\n\n  computed: {\n    border (): object {\n      return {\n        'border-radius': this.isOpened\n          ? '20px 20px 0 0'\n          : '20px'\n      }\n    },\n\n    hasSlots (): boolean {\n      return !!Object.keys(this.$scopedSlots).length\n    },\n\n    isOpened (): boolean {\n      return this.showItems && this.__items.length\n    },\n\n    __items (): object[] {\n      if (!this.search) return this.options\n\n      const query: string = normalizeDiacritics(this.search)\n      const xs: object[] = setDiacritic(this.options, this.normalizeProp, this.searchProp)\n\n      return findBy(xs, query, this.normalizeProp)\n    }\n  },\n\n  methods: {\n    reset () {\n      this.showItems = false\n      this.pointer = -1 // reset pointer\n    },\n\n    down () {\n      if (this.pointer < this.__items.length - 1) this.pointer++\n    },\n\n    up () {\n      if (this.pointer > 0) this.pointer--\n    },\n\n    select ({ key } = 'Enter'): void {\n      if (key !== 'Enter' && key !== 'Click') return\n\n      const item = this.__items[this.pointer]\n\n      this.$nextTick(this.reset)\n\n      if (!this.hasSlots) {\n        const value = item[this.searchProp]\n\n        this.search = value\n        this.onSearch(value)\n      }\n\n      this.$emit('vue-coemplete:select', item)\n    },\n\n    onSearch (value: string): void {\n      this.search = value\n      this.showItems = true\n    },\n\n    onVisibilityChange (): void {\n      const action = document.visibilityState === 'visible' ? 'focus' : 'unfocus'\n\n      this.$emit(`vue-coemplete:${action}`)\n\n      if (!this.$refs.input) return\n\n      this.$refs.input.focus()\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete {\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background: white;\n\n  & > .search-wrapper {\n    display: flex;\n    min-height: 40px;\n    position: relative;\n\n    & > .input {\n      flex: 1;\n      outline: 0;\n      width: 100%;\n      border: none;\n      height: 40px;\n      font-size: 14px;\n      padding-left: 15px;\n      border-radius: 20px;\n      padding-right: 40px;\n      color: rgba(18, 30, 72, 0.8);\n      background: rgba(18, 30, 72, 0.05);\n    }\n  }\n}\n</style>\n", ".vue-coemplete {\n  display: flex;\n  flex-direction: column;\n  position: relative;\n  background: white;\n}\n.vue-coemplete > .search-wrapper {\n  display: flex;\n  min-height: 40px;\n  position: relative;\n}\n.vue-coemplete > .search-wrapper > .input {\n  flex: 1;\n  outline: 0;\n  width: 100%;\n  border: none;\n  height: 40px;\n  font-size: 14px;\n  padding-left: 15px;\n  border-radius: 20px;\n  padding-right: 40px;\n  color: rgba(18, 30, 72, 0.8);\n  background: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=VueCoemplete.vue.map */"]
     },
     media: undefined
   });
@@ -1456,7 +1458,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("vue-coemplete", {
-    attrs: { diacritic: "", placeholder: "Pesquisar", options: _vm.options },
+    attrs: { placeholder: "Pesquisar", options: _vm.options },
     on: {
       "vue-coemplete:focus": _vm.setFocus,
       "vue-coemplete:select": function(item) {
@@ -1635,7 +1637,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -1713,7 +1714,7 @@ __webpack_require__.r(__webpack_exports__);
 
 exports = module.exports = __webpack_require__(/*! ../node_modules/poi/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/poi/node_modules/css-loader/dist/runtime/api.js")(true);
 // Module
-exports.push([module.i, "#app {\n  display: flex;\n  justify-content: space-evenly;\n}\n", "",{"version":3,"sources":["/home/viniazvd/Área de Trabalho/convenia-spa/vue-coemplete/examples/Index.vue"],"names":[],"mappings":"AAmBA;EACE,aAAa;EACb,6BAA6B;AAAA","file":"Index.vue?vue&type=style&index=0&lang=scss&","sourcesContent":["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n#app {\n  display: flex;\n  justify-content: space-evenly;\n}\n"]}]);
+exports.push([module.i, "#app {\n  display: flex;\n  justify-content: space-evenly;\n}\n", "",{"version":3,"sources":["/Users/convenia/Desktop/convenia-spa/vue-coemplete/examples/Index.vue"],"names":[],"mappings":"AAmBA;EACE,aAAa;EACb,6BAA6B;AAAA","file":"Index.vue?vue&type=style&index=0&lang=scss&","sourcesContent":["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n#app {\n  display: flex;\n  justify-content: space-evenly;\n}\n"]}]);
 
 
 
@@ -1728,7 +1729,7 @@ exports.push([module.i, "#app {\n  display: flex;\n  justify-content: space-even
 
 exports = module.exports = __webpack_require__(/*! ../node_modules/poi/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/poi/node_modules/css-loader/dist/runtime/api.js")(true);
 // Module
-exports.push([module.i, ".input {\n  border: 0;\n  width: 100%;\n  outline: none;\n  padding-left: 20px;\n  border-radius: 20px;\n}\n", "",{"version":3,"sources":["/home/viniazvd/Área de Trabalho/convenia-spa/vue-coemplete/examples/WithSlots.vue"],"names":[],"mappings":"AA6DA;EACE,SAAS;EACT,WAAW;EACX,aAAa;EACb,kBAAkB;EAClB,mBAAmB;AAAA","file":"WithSlots.vue?vue&type=style&index=0&lang=scss&","sourcesContent":["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n.input {\n  border: 0;\n  width: 100%;\n  outline: none;\n  padding-left: 20px;\n  border-radius: 20px;\n}\n"]}]);
+exports.push([module.i, ".input {\n  border: 0;\n  width: 100%;\n  outline: none;\n  padding-left: 20px;\n  border-radius: 20px;\n}\n", "",{"version":3,"sources":["/Users/convenia/Desktop/convenia-spa/vue-coemplete/examples/WithSlots.vue"],"names":[],"mappings":"AA4DA;EACE,SAAS;EACT,WAAW;EACX,aAAa;EACb,kBAAkB;EAClB,mBAAmB;AAAA","file":"WithSlots.vue?vue&type=style&index=0&lang=scss&","sourcesContent":["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n.input {\n  border: 0;\n  width: 100%;\n  outline: none;\n  padding-left: 20px;\n  border-radius: 20px;\n}\n"]}]);
 
 
 
