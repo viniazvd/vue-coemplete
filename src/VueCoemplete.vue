@@ -29,7 +29,7 @@
     </div>
 
     <item-list
-      v-show="showList"
+      v-show="isOpened || showList"
 
       :items="__items"
       :search="search"
@@ -87,7 +87,9 @@ export default Vue.extend({
     minToSearch: {
       type: Number,
       default: 2
-    }
+    },
+
+    showList: Boolean
   },
 
   directives: { clickOutside },
@@ -96,10 +98,7 @@ export default Vue.extend({
     return {
       search: '' as string,
       pointer: -1 as number,
-      showItems: false as boolean,
-
-      isMobile: false,
-      mobileMedia: window.matchMedia('(max-width: 1023px)'),
+      showItems: false as boolean
     }
   },
 
@@ -116,9 +115,6 @@ export default Vue.extend({
 
   mounted () {
     bindEvent(document, 'visibilitychange', this.onVisibilityChange)
-
-    this.setBreakpoint()
-    this.mobileMedia.addListener(this.setBreakpoint)
   },
 
   computed: {
@@ -137,10 +133,6 @@ export default Vue.extend({
         '--is-opened': this.isOpened,
         '--has-shadow': this.hasShadow
       }]
-    },
-
-    showList () {
-      return this.isOpened || this.isMobile
     },
 
     hasSlots (): boolean {
@@ -166,10 +158,6 @@ export default Vue.extend({
   },
 
   methods: {
-    setBreakpoint () {
-      this.isMobile = this.mobileMedia && this.mobileMedia.matches
-    },
-
     reset () {
       this.showItems = false
       this.pointer = -1 // reset pointer
@@ -213,11 +201,7 @@ export default Vue.extend({
       if (!this.$refs.input) return
 
       this.$refs.input.focus()
-    },
-
-    beforeDestroy () {
-      this.mobileMedia.removeListener(this.setBreakpoint)
-    },
+    }
   }
 })
 </script>
