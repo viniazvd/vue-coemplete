@@ -1,6 +1,6 @@
 {
   "name": "vue-coemplete",
-  "version": "0.3.55",
+  "version": "0.3.56",
   "files": [ "dist/" ],
   "main": "dist/bundle.cjs.js",
   "module": "dist/index.esm.js",
