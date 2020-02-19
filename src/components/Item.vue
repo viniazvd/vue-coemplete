@@ -1,8 +1,8 @@
 <template>
   <div
-    :class="['item', { '-active': index === pointer }]"
+    :class="['vue-coemplete-item', { '-active': index === pointer }]"
 
-    @click.capture="$emit('item-list:click')"
+    @click="$emit('item-list:click')"
     @mouseenter.self="$emit('item-list:mouseenter', index)"
   >
     <slot name="sufix" :item="item" />
@@ -70,13 +70,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.item {
+.vue-coemplete-item {
   opacity: 0.8;
   color: #121E48;
   padding: 0 15px;
   font-size: 14px;
   line-height: 40px;
-  box-sizing: border-box;
 
   cursor: pointer;
 
