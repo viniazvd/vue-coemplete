@@ -245,6 +245,7 @@ var script = Vue.extend({
       required: true
     },
     index: Number,
+    pointer: Number,
     search: String
   },
   methods: {
@@ -422,7 +423,21 @@ var __vue_render__ = function () {
   var _c = _vm._self._c || _h;
 
   return _c("div", {
-    staticClass: "text-wrapper"
+    class: ["item", {
+      "-active": _vm.index === _vm.pointer
+    }],
+    on: {
+      "!click": function ($event) {
+        return _vm.$emit("item-list:click");
+      },
+      mouseenter: function ($event) {
+        if ($event.target !== $event.currentTarget) {
+          return null;
+        }
+
+        return _vm.$emit("item-list:mouseenter", _vm.index);
+      }
+    }
   }, [_vm._t("sufix", null, {
     item: _vm.item
   }), _vm._v(" "), _c("span", {
@@ -439,14 +454,15 @@ __vue_render__._withStripped = true;
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-d679641e_0", {
-    source: "\n\n/*# sourceMappingURL=Item.vue.map */",
+  inject("data-v-3481b9d2_0", {
+    source: ".item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  box-sizing: border-box;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=Item.vue.map */",
     map: {
       "version": 3,
-      "sources": ["Item.vue"],
+      "sources": ["/Users/convenia/Desktop/convenia-spa/vue-coemplete/src/components/Item.vue", "Item.vue"],
       "names": [],
-      "mappings": ";;AAEA,mCAAmC",
-      "file": "Item.vue"
+      "mappings": "AAwEA;EACA,YAAA;EACA,cAAA;EACA,eAAA;EACA,eAAA;EACA,iBAAA;EACA,sBAAA;EAEA,eAAA;EAEA,kBAAA;EACA,mBAAA;EACA,uBAAA;ACzEA;AD2EA;EAAA,wCAAA;ACxEA;;AAEA,mCAAmC",
+      "file": "Item.vue",
+      "sourcesContent": ["<template>\n  <div\n    :class=\"['item', { '-active': index === pointer }]\"\n\n    @click.capture=\"$emit('item-list:click')\"\n    @mouseenter.self=\"$emit('item-list:mouseenter', index)\"\n  >\n    <slot name=\"sufix\" :item=\"item\" />\n    <span :ref=\"index\" class=\"text\">{{ setHightlight() }}</span>\n    <slot name=\"after\" :item=\"item\" />\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport getDiacritic from '../utils/getDiacritic'\nimport normalizeDiacritics from '../utils/normalizeDiacritics'\n\nimport Vue from 'vue'\n\nexport default Vue.extend({\n  name: 'item',\n\n  props: {\n    searchProp: String,\n\n    normalizeProp: String,\n\n    item: {\n      type: Object,\n      required: true\n    },\n\n    index: Number,\n\n    pointer: Number,\n\n    search: String\n  },\n\n  methods: {\n    setHightlight (): void {\n      // reason: wait for loop items to render/assemble to use $refs\n      this.$nextTick(() => {\n        const el: { [key: number]: HTMLSpanElement } = this.$refs[this.index]\n\n        // reset data\n        el.innerHTML = ''\n\n        const typed = getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp])\n\n        this.item[this.searchProp]\n          .split(typed)\n          .forEach((chunk: string, i: number, array: string[]) => {\n            const hasAfter: Boolean = !!array[i + 1]\n            const hasBefore: Boolean = !!array[i - 1]\n            const B_TAG: HTMLElement = document.createElement('b')\n\n            if (!chunk) el.innerHTML += typed\n            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed\n\n            B_TAG.innerHTML += chunk\n            el.appendChild(B_TAG)\n\n            if (chunk && hasAfter) el.innerHTML += typed\n          })\n      })\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  box-sizing: border-box;\n\n  cursor: pointer;\n\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n\n  &.-active { background-color: rgba(18, 30, 72, 0.05); }\n}\n</style>", ".item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  box-sizing: border-box;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=Item.vue.map */"]
     },
     media: undefined
   });
@@ -499,27 +515,12 @@ var __vue_render__$1 = function () {
   }, [_c("div", {
     staticClass: "list"
   }, _vm._l(_vm.items, function (item, index) {
-    return _c("div", {
+    return _c("item", _vm._g(_vm._b({
       key: index,
-      class: ["item", {
-        "-active": index === _vm.pointer
-      }],
-      on: {
-        click: function ($event) {
-          return _vm.$emit("item-list:click");
-        },
-        mouseenter: function ($event) {
-          if ($event.target !== $event.currentTarget) {
-            return null;
-          }
-
-          return _vm.$emit("item-list:mouseenter", index);
-        }
-      }
-    }, [_c("item", _vm._b({
       attrs: {
         item: item,
-        index: index
+        index: index,
+        pointer: _vm.pointer
       },
       scopedSlots: _vm._u([{
         key: "before",
@@ -538,8 +539,8 @@ var __vue_render__$1 = function () {
           });
         }
       }], null, true)
-    }, "item", _vm.$attrs, false))], 1);
-  }), 0)]);
+    }, "item", _vm.$attrs, false), _vm.$listeners));
+  }), 1)]);
 };
 
 var __vue_staticRenderFns__$1 = [];
@@ -548,15 +549,15 @@ __vue_render__$1._withStripped = true;
 
 const __vue_inject_styles__$1 = function (inject) {
   if (!inject) return;
-  inject("data-v-99cc7e16_0", {
-    source: ".list-wrapper {\n  display: flex;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px);\n}\n.list-wrapper > .list {\n  width: 100%;\n  font-size: 14px;\n  overflow-y: auto;\n}\n.list-wrapper > .list > .item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  box-sizing: border-box;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.list-wrapper > .list > .item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=ItemList.vue.map */",
+  inject("data-v-17a0cfb9_0", {
+    source: ".list-wrapper {\n  display: flex;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px);\n}\n.list-wrapper > .list {\n  width: 100%;\n  font-size: 14px;\n  overflow-y: auto;\n}\n\n/*# sourceMappingURL=ItemList.vue.map */",
     map: {
       "version": 3,
       "sources": ["/Users/convenia/Desktop/convenia-spa/vue-coemplete/src/components/ItemList.vue", "ItemList.vue"],
       "names": [],
-      "mappings": "AAwCA;EACA,aAAA;EAEA,kBAAA;EACA,OAAA;EACA,SAAA;EAEA,WAAA;EACA,WAAA;EACA,iBAAA;EACA,0BAAA;EACA,6CAAA;EACA,8BAAA;ACzCA;AD2CA;EACA,WAAA;EACA,eAAA;EACA,gBAAA;ACzCA;AD2CA;EACA,YAAA;EACA,cAAA;EACA,eAAA;EACA,eAAA;EACA,iBAAA;EACA,sBAAA;EAEA,eAAA;EAEA,kBAAA;EACA,mBAAA;EACA,uBAAA;AC3CA;AD6CA;EAAA,wCAAA;AC1CA;;AAEA,uCAAuC",
+      "mappings": "AAwCA;EACA,aAAA;EAEA,kBAAA;EACA,OAAA;EACA,SAAA;EAEA,WAAA;EACA,WAAA;EACA,iBAAA;EACA,0BAAA;EACA,6CAAA;EACA,8BAAA;ACzCA;AD2CA;EACA,WAAA;EACA,eAAA;EACA,gBAAA;ACzCA;;AAEA,uCAAuC",
       "file": "ItemList.vue",
-      "sourcesContent": ["<template>\n  <div class=\"list-wrapper\">\n    <div class=\"list\">\n      <div\n        v-for=\"(item, index) in items\"\n\n        :key=\"index\"\n        :class=\"['item', { '-active': index === pointer }]\"\n\n        @click=\"$emit('item-list:click')\"\n        @mouseenter.self=\"$emit('item-list:mouseenter', index)\"\n      >\n        <item :item=\"item\" :index=\"index\" v-bind=\"$attrs\">\n          <slot slot=\"before\" name=\"before\" slot-scope=\"{ item }\" :item=\"item\" />\n          <slot slot=\"after\" name=\"after\" slot-scope=\"{ item }\" :item=\"item\" />\n        </item>\n      </div>\n    </div>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\nimport Item from './Item.vue'\n\nexport default Vue.extend({\n  components: { Item },\n\n  props: {\n    items: {\n      type: Array,\n      required: true\n    },\n\n    pointer: Number\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.list-wrapper {\n  display: flex;\n\n  position: absolute;\n  left: 0;\n  top: 100%;\n\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px); // 40 = input size\n\n  & > .list {\n    width: 100%;\n    font-size: 14px;\n    overflow-y: auto;\n\n    & > .item {\n      opacity: 0.8;\n      color: #121E48;\n      padding: 0 15px;\n      font-size: 14px;\n      line-height: 40px;\n      box-sizing: border-box;\n\n      cursor: pointer;\n\n      overflow-x: hidden;\n      white-space: nowrap;\n      text-overflow: ellipsis;\n\n      &.-active { background-color: rgba(18, 30, 72, 0.05); }\n    }\n  }\n}\n</style>", ".list-wrapper {\n  display: flex;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px);\n}\n.list-wrapper > .list {\n  width: 100%;\n  font-size: 14px;\n  overflow-y: auto;\n}\n.list-wrapper > .list > .item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  box-sizing: border-box;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.list-wrapper > .list > .item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=ItemList.vue.map */"]
+      "sourcesContent": ["<template>\n  <div class=\"list-wrapper\">\n    <div class=\"list\">\n      <item\n        v-for=\"(item, index) in items\"\n\n        :key=\"index\"\n        :item=\"item\"\n        :index=\"index\"\n        :pointer=\"pointer\"\n\n        v-bind=\"$attrs\"\n        v-on=\"$listeners\"\n      >\n        <slot slot=\"before\" name=\"before\" slot-scope=\"{ item }\" :item=\"item\" />\n        <slot slot=\"after\" name=\"after\" slot-scope=\"{ item }\" :item=\"item\" />\n      </item>\n    </div>\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport Vue from 'vue'\nimport Item from './Item.vue'\n\nexport default Vue.extend({\n  components: { Item },\n\n  props: {\n    items: {\n      type: Array,\n      required: true\n    },\n\n    pointer: Number\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.list-wrapper {\n  display: flex;\n\n  position: absolute;\n  left: 0;\n  top: 100%;\n\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px); // 40 = input size\n\n  & > .list {\n    width: 100%;\n    font-size: 14px;\n    overflow-y: auto;\n  }\n}\n</style>", ".list-wrapper {\n  display: flex;\n  position: absolute;\n  left: 0;\n  top: 100%;\n  width: 100%;\n  z-index: 10;\n  background: white;\n  border-radius: 0 0 5px 5px;\n  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.2);\n  max-height: calc(285px - 40px);\n}\n.list-wrapper > .list {\n  width: 100%;\n  font-size: 14px;\n  overflow-y: auto;\n}\n\n/*# sourceMappingURL=ItemList.vue.map */"]
     },
     media: undefined
   });
