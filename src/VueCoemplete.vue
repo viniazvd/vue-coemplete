@@ -101,8 +101,9 @@ export default Vue.extend({
   },
 
   watch: {
-    value (value) {
-      this.search = value
+    value: {
+      immediate: true,
+      handler (value) { this.search = value }
     }
   },
 
