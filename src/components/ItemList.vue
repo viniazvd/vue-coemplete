@@ -1,20 +1,20 @@
 <template>
   <div class="list-wrapper">
     <div class="list">
-      <div
+      <item
         v-for="(item, index) in items"
 
         :key="index"
-        :class="['item', { '-active': index === pointer }]"
+        :item="item"
+        :index="index"
+        :pointer="pointer"
 
-        @click="$emit('item-list:click')"
-        @mouseenter.self="$emit('item-list:mouseenter', index)"
+        v-bind="$attrs"
+        v-on="$listeners"
       >
-        <item :item="item" :index="index" v-bind="$attrs">
-          <slot slot="before" name="before" slot-scope="{ item }" :item="item" />
-          <slot slot="after" name="after" slot-scope="{ item }" :item="item" />
-        </item>
-      </div>
+        <slot slot="before" name="before" slot-scope="{ item }" :item="item" />
+        <slot slot="after" name="after" slot-scope="{ item }" :item="item" />
+      </item>
     </div>
   </div>
 </template>
@@ -56,23 +56,6 @@ export default Vue.extend({
     width: 100%;
     font-size: 14px;
     overflow-y: auto;
-
-    & > .item {
-      opacity: 0.8;
-      color: #121E48;
-      padding: 0 15px;
-      font-size: 14px;
-      line-height: 40px;
-      box-sizing: border-box;
-
-      cursor: pointer;
-
-      overflow-x: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-
-      &.-active { background-color: rgba(18, 30, 72, 0.05); }
-    }
   }
 }
 </style>

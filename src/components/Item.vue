@@ -1,5 +1,10 @@
 <template>
-  <div class="text-wrapper">
+  <div
+    :class="['item', { '-active': index === pointer }]"
+
+    @click.capture="$emit('item-list:click')"
+    @mouseenter.self="$emit('item-list:mouseenter', index)"
+  >
     <slot name="sufix" :item="item" />
     <span :ref="index" class="text">{{ setHightlight() }}</span>
     <slot name="after" :item="item" />
@@ -26,6 +31,8 @@ export default Vue.extend({
     },
 
     index: Number,
+
+    pointer: Number,
 
     search: String
   },
@@ -63,5 +70,20 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.item {
+  opacity: 0.8;
+  color: #121E48;
+  padding: 0 15px;
+  font-size: 14px;
+  line-height: 40px;
+  box-sizing: border-box;
 
+  cursor: pointer;
+
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &.-active { background-color: rgba(18, 30, 72, 0.05); }
+}
 </style>
