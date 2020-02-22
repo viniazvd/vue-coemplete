@@ -108,8 +108,9 @@ export default Vue.extend({
       handler (value) { this.search = value }
     },
 
-    search () {
-      this.$emit('vue-coemplete:items', this.__items)
+    search: {
+      immediate: true,
+      handler () { this.$emit('vue-coemplete:items', this.__items) }
     }
   },
 
