@@ -135,6 +135,14 @@ var __assign = function () {
   return __assign.apply(this, arguments);
 };
 
+function __spreadArrays() {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) r[k] = a[j];
+
+  return r;
+}
+
 var clickOutside = {
   bind(el, binding) {
     const handler = e => {
@@ -248,28 +256,25 @@ var script = Vue.extend({
     pointer: Number,
     search: String
   },
-  methods: {
-    setHightlight: function () {
-      var _this = this; // reason: wait for loop items to render/assemble to use $refs
-
-
-      this.$nextTick(function () {
-        var el = _this.$refs[_this.index]; // reset data
-
-        el.innerHTML = '';
-        var typed = getDiacritic(_this.item, _this.searchProp, normalizeDiacritics(_this.search), _this.item[_this.normalizeProp]);
-
-        _this.item[_this.searchProp].split(typed).forEach(function (chunk, i, array) {
-          var hasAfter = !!array[i + 1];
-          var hasBefore = !!array[i - 1];
-          var B_TAG = document.createElement('b');
-          if (!chunk) el.innerHTML += typed;
-          if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed;
-          B_TAG.innerHTML += chunk;
-          el.appendChild(B_TAG);
-          if (chunk && hasAfter) el.innerHTML += typed;
-        });
-      });
+  computed: {
+    chunks: function () {
+      var typed = getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp]);
+      var chunks = this.item[this.searchProp].split(typed).reduce(function (chunks, split, i, splits) {
+        var hasAfter = !!splits[i + 1];
+        var hasBefore = !!splits[i - 1];
+        var splitChunk = {
+          content: split,
+          bold: true
+        };
+        var typedChunk = {
+          content: typed,
+          bold: false
+        };
+        var initialChunks = !split ? __spreadArrays(chunks, [typedChunk]) : __spreadArrays(chunks);
+        var preChunks = !split && !hasBefore && !hasAfter ? [typedChunk] : initialChunks;
+        return __spreadArrays(preChunks, [splitChunk, split && hasAfter ? typedChunk : {}]);
+      }, []);
+      return chunks;
     }
   }
 });
@@ -443,7 +448,12 @@ var __vue_render__ = function () {
   }), _vm._v(" "), _c("span", {
     ref: _vm.index,
     staticClass: "text"
-  }, [_vm._v(_vm._s(_vm.setHightlight()))]), _vm._v(" "), _vm._t("after", null, {
+  }, _vm._l(_vm.chunks, function (chunk, key) {
+    return _c(chunk.bold ? "b" : "span", {
+      key: key,
+      tag: "component"
+    }, [_vm._v(_vm._s(chunk.content))]);
+  }), 1), _vm._v(" "), _vm._t("after", null, {
     item: _vm.item
   })], 2);
 };
@@ -454,15 +464,15 @@ __vue_render__._withStripped = true;
 
 const __vue_inject_styles__ = function (inject) {
   if (!inject) return;
-  inject("data-v-0a48bda4_0", {
+  inject("data-v-341a3519_0", {
     source: ".vue-coemplete-item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.vue-coemplete-item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=Item.vue.map */",
     map: {
       "version": 3,
       "sources": ["/home/viniazvd/Área de Trabalho/convenia-spa/vue-coemplete/src/components/Item.vue", "Item.vue"],
       "names": [],
-      "mappings": "AAwEA;EACA,YAAA;EACA,cAAA;EACA,eAAA;EACA,eAAA;EACA,iBAAA;EAEA,eAAA;EAEA,kBAAA;EACA,mBAAA;EACA,uBAAA;ACzEA;AD2EA;EAAA,wCAAA;ACxEA;;AAEA,mCAAmC",
+      "mappings": "AAkFA;EACA,YAAA;EACA,cAAA;EACA,eAAA;EACA,eAAA;EACA,iBAAA;EAEA,eAAA;EAEA,kBAAA;EACA,mBAAA;EACA,uBAAA;ACnFA;ADqFA;EAAA,wCAAA;AClFA;;AAEA,mCAAmC",
       "file": "Item.vue",
-      "sourcesContent": ["<template>\n  <div\n    :class=\"['vue-coemplete-item', { '-active': index === pointer }]\"\n\n    @click=\"$emit('item-list:click')\"\n    @mouseenter.self=\"$emit('item-list:mouseenter', index)\"\n  >\n    <slot name=\"sufix\" :item=\"item\" />\n    <span :ref=\"index\" class=\"text\">{{ setHightlight() }}</span>\n    <slot name=\"after\" :item=\"item\" />\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport getDiacritic from '../utils/getDiacritic'\nimport normalizeDiacritics from '../utils/normalizeDiacritics'\n\nimport Vue from 'vue'\n\nexport default Vue.extend({\n  name: 'item',\n\n  props: {\n    searchProp: String,\n\n    normalizeProp: String,\n\n    item: {\n      type: Object,\n      required: true\n    },\n\n    index: Number,\n\n    pointer: Number,\n\n    search: String\n  },\n\n  methods: {\n    setHightlight (): void {\n      // reason: wait for loop items to render/assemble to use $refs\n      this.$nextTick(() => {\n        const el: { [key: number]: HTMLSpanElement } = this.$refs[this.index]\n\n        // reset data\n        el.innerHTML = ''\n\n        const typed = getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp])\n\n        this.item[this.searchProp]\n          .split(typed)\n          .forEach((chunk: string, i: number, array: string[]) => {\n            const hasAfter: Boolean = !!array[i + 1]\n            const hasBefore: Boolean = !!array[i - 1]\n            const B_TAG: HTMLElement = document.createElement('b')\n\n            if (!chunk) el.innerHTML += typed\n            if (!chunk && !hasBefore && !hasAfter) el.innerHTML = typed\n\n            B_TAG.innerHTML += chunk\n            el.appendChild(B_TAG)\n\n            if (chunk && hasAfter) el.innerHTML += typed\n          })\n      })\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete-item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n\n  cursor: pointer;\n\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n\n  &.-active { background-color: rgba(18, 30, 72, 0.05); }\n}\n</style>", ".vue-coemplete-item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.vue-coemplete-item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=Item.vue.map */"]
+      "sourcesContent": ["<template>\n  <div\n    :class=\"['vue-coemplete-item', { '-active': index === pointer }]\"\n\n    @click=\"$emit('item-list:click')\"\n    @mouseenter.self=\"$emit('item-list:mouseenter', index)\"\n  >\n    <slot name=\"sufix\" :item=\"item\" />\n\n    <span :ref=\"index\" class=\"text\">\n      <component\n        v-for=\"(chunk, key) in chunks\"\n        :key=\"key\"\n        :is=\"chunk.bold ? 'b' : 'span'\"\n      >{{ chunk.content }}</component>\n    </span>\n\n    <slot name=\"after\" :item=\"item\" />\n  </div>\n</template>\n\n<script lang=\"ts\">\nimport getDiacritic from '../utils/getDiacritic'\nimport normalizeDiacritics from '../utils/normalizeDiacritics'\n\nimport Vue from 'vue'\n\ninterface Chunk {\n  content: string,\n  bold: boolean,\n}\n\nexport default Vue.extend({\n  name: 'item',\n\n  props: {\n    searchProp: String,\n\n    normalizeProp: String,\n\n    item: {\n      type: Object,\n      required: true\n    },\n\n    index: Number,\n\n    pointer: Number,\n\n    search: String\n  },\n\n  computed: {\n    chunks () : Chunk[] {\n      const typed = getDiacritic(this.item, this.searchProp, normalizeDiacritics(this.search), this.item[this.normalizeProp])\n\n      const chunks = this.item[this.searchProp]\n        .split(typed)\n        .reduce((chunks: Chunk[], split: string, i: number, splits: string[]) => {\n          const hasAfter: Boolean = !!splits[i + 1]\n          const hasBefore: Boolean = !!splits[i - 1]\n          const splitChunk = { content: split, bold: true }\n          const typedChunk = { content: typed, bold: false }\n          const initialChunks = !split ? [ ...chunks, typedChunk ] : [ ...chunks ]\n          const preChunks = (!split && !hasBefore && !hasAfter)\n            ? [ typedChunk ]\n            : initialChunks\n\n          return [\n            ...preChunks,\n            splitChunk,\n            split && hasAfter ? typedChunk : {}\n          ]\n        }, [])\n\n      return chunks\n    }\n  }\n})\n</script>\n\n<style lang=\"scss\">\n.vue-coemplete-item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n\n  cursor: pointer;\n\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n\n  &.-active { background-color: rgba(18, 30, 72, 0.05); }\n}\n</style>\n", ".vue-coemplete-item {\n  opacity: 0.8;\n  color: #121E48;\n  padding: 0 15px;\n  font-size: 14px;\n  line-height: 40px;\n  cursor: pointer;\n  overflow-x: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.vue-coemplete-item.-active {\n  background-color: rgba(18, 30, 72, 0.05);\n}\n\n/*# sourceMappingURL=Item.vue.map */"]
     },
     media: undefined
   });
