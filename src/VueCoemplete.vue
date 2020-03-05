@@ -132,7 +132,8 @@ export default Vue.extend({
     classes () {
       return ['vue-coemplete', {
         '--is-opened': this.isOpened,
-        '--has-shadow': this.hasShadow || this.search
+        '--is-closed': !this.showItems,
+        '--has-shadow': this.hasShadow
       }]
     },
 
