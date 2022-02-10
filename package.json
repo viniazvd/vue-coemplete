@@ -19,7 +19,7 @@
     "autoprefixer": "^9.4.3",
     "babel-core": "^7.0.0-bridge",
     "babel-loader": "^8.0.6",
-    "node-sass": "^4.13.0",
+    "node-sass": "^7.0.0",
     "poi": "^12.1.6",
     "rollup": "^1.29.0",
     "rollup-plugin-typescript": "^1.0.1",
